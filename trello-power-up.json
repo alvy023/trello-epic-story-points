@@ -1,1 +1,15 @@
-
+{
+  "capabilities": {
+    "card-buttons": true,
+    "card-badges": true,
+    "card-detail-badges": true
+  },
+  "connectors": {
+    "iframe": {
+      "url": "https://your-github-username.github.io/your-repo-name/"
+    }
+  },
+  "icon": {
+    "url": "https://cdn-icons-png.flaticon.com/512/992/992651.png"
+  }
+}
