@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Parent Card</title>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+        var t = TrelloPowerUp.iframe();
+
+        function saveParent() {
+            var parentId = document.getElementById("parentCardId").value;
+            t.set('card', 'shared', 'parentCard', parentId).then(() => {
+                t.closePopup();
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2>Set Parent Card</h2>
+    <input type="text" id="parentCardId" placeholder="Enter Parent Card ID" />
+    <button onclick="saveParent()">Save</button>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "capabilities": {
+    "card-buttons": true,
+    "card-badges": true,
+    "card-detail-badges": true
+  },
+  "connectors": {
+    "iframe": {
+      "url": "https://alvy023.github.io/trello-epic-story-points/"
+    }
+  },
+  "icon": {
+    "url": "https://cdn-icons-png.flaticon.com/512/992/992651.png"
+  }
+}
