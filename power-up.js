@@ -29,14 +29,14 @@ TrelloPowerUp.initialize({
       const badges = [];
       if (points) {
         badges.push({
-          text: points + ' SP',
-          color: 'blue'
+          text: points,
+          color: 'green'
         });
       }
       if (parentName) {
         badges.push({
-          text: 'Parent: ' + parentName,
-          color: 'green'
+          text: parentName,
+          color: 'purple'
         });
       }
       return badges;
@@ -46,23 +46,42 @@ TrelloPowerUp.initialize({
   'card-detail-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.get('card', 'shared', 'parentCardName')
-    ]).then(function([points, parentName]) {
-      const badges = [];
-      if (points) {
-        badges.push({
-          title: 'Story Points',
-          text: points + ' SP',
-          color: 'blue'
-        });
+      t.get('card', 'shared', ['parentCardId', 'parentCardName'])
+    ]).then(function([points, data]) {
+        const badges = [];
+        if (points) {
+          badges.push({
+            title: 'Story Points',
+            text: points
+          });
+        }
+        if (data.parentCardId && data.parentCardName) {
+          badges.push({
+            title: 'Parent Card',
+            text: data.parentCardName,
+            callback: function(t) {
+              return t.navigate({ url: `https://trello.com/c/${data.parentCardId}` });
+            }
+          });
+        }
+        return badges;
+      });
+  },
+
+  'card-back-section': function(t, options) {
+    return t.get('card', 'shared', 'childCards').then(function(children) {
+      if (children && children.length > 0) {
+        return {
+          title: 'Child Cards',
+          icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
+          content: {
+            type: 'iframe',
+            url: t.signUrl('child-cards.html'),
+            height: 200
+          }
+        };
       }
-      if (parentName) {
-        badges.push({
-          title: 'Parent Card',
-          text: parentName
-        });
-      }
-      return badges;
+      return null;
     });
   },
 
