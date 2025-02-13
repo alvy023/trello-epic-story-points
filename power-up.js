@@ -22,34 +22,57 @@ TrelloPowerUp.initialize({
   },
 
   'card-badges': function(t, options) {
-    return t.get('card', 'shared', 'storyPoints')
-      .then(function(points) {
-        if (points) {
-          return [{
-            text: points + ' SP',
-            color: 'blue'
-          }];
-        }
-        return [];
-      });
+    return Promise.all([
+      t.get('card', 'shared', 'storyPoints'),
+      t.get('card', 'shared', 'parentCard')
+    ]).then(function([points, parentId]) {
+      const badges = [];
+      if (points) {
+        badges.push({
+          text: points + ' SP',
+          color: 'blue'
+        });
+      }
+      if (parentId) {
+        return t.card(parentId, 'name').then(function(parentCard) {
+          badges.push({
+            text: 'Parent: ' + parentCard.name,
+            color: 'green'
+          });
+          return badges;
+        });
+      }
+      return badges;
+    });
   },
 
   'card-detail-badges': function(t, options) {
-    return t.get('card', 'shared', 'parentCard')
-      .then(function(parentId) {
-        if (parentId) {
-          return [{
+    return Promise.all([
+      t.get('card', 'shared', 'storyPoints'),
+      t.get('card', 'shared', 'parentCard')
+    ]).then(function([points, parentId]) {
+      const badges = [];
+      if (points) {
+        badges.push({
+          title: 'Story Points',
+          text: points + ' SP',
+          color: 'blue'
+        });
+      }
+      if (parentId) {
+        return t.card(parentId, 'name').then(function(parentCard) {
+          badges.push({
             title: 'Parent Card',
-            text: 'Linked',
+            text: parentCard.name,
             callback: function(t) {
-              return t.board('id', 'name').then(function(board) {
-                window.open(`https://trello.com/c/${parentId}`, '_blank');
-              });
+              window.location.href = `https://trello.com/c/${parentId}`;
             }
-          }];
-        }
-        return [];
-      });
+          });
+          return badges;
+        });
+      }
+      return badges;
+    });
   },
 
   'show-settings': function(t, options) {
