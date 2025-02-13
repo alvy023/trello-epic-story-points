@@ -29,7 +29,7 @@
 
             if (!parentId) return;
 
-            t.get('card', 'id').then(function(card) {
+            t.card('id', 'name').then(function(card) {
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
                     var updates = [
                         t.set('card', 'shared', {
@@ -38,18 +38,18 @@
                         }),
                         t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                             boardChildren = boardChildren || {};
-                            
+            
                             // Remove from old parent
                             if (oldParentId && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
                             }
-                            
+            
                             // Add to new parent
                             boardChildren[parentId] = boardChildren[parentId] || [];
                             if (!boardChildren[parentId].some(c => c.id === card.id)) {
                                 boardChildren[parentId].push({ id: card.id, name: card.name });
                             }
-
+            
                             return t.set('board', 'shared', 'childCards', boardChildren);
                         })
                     ];
@@ -60,7 +60,7 @@
         }
 
         function removeParent() {
-            t.get('card', 'id').then(function(card) {
+            t.card('id', 'name').then(function(card) {
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
                     var updates = [
                         t.remove('card', 'shared', ['parentCardId', 'parentCardName']),
