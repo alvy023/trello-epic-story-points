@@ -34,11 +34,14 @@ TrelloPowerUp.initialize({
         });
       }
       if (parentId) {
-        return t.card(parentId, 'name').then(function(parentCard) {
-          badges.push({
-            text: 'Parent: ' + parentCard.name,
-            color: 'green'
-          });
+        return t.get('board', 'shared', 'cards').then(function(cards) {
+          const parentCard = cards.find(card => card.id === parentId);
+          if (parentCard) {
+            badges.push({
+              text: 'Parent: ' + parentCard.name,
+              color: 'green'
+            });
+          }
           return badges;
         });
       }
@@ -60,14 +63,17 @@ TrelloPowerUp.initialize({
         });
       }
       if (parentId) {
-        return t.card(parentId, 'name').then(function(parentCard) {
-          badges.push({
-            title: 'Parent Card',
-            text: parentCard.name,
-            callback: function(t) {
-              window.location.href = `https://trello.com/c/${parentId}`;
-            }
-          });
+        return t.get('board', 'shared', 'cards').then(function(cards) {
+          const parentCard = cards.find(card => card.id === parentId);
+          if (parentCard) {
+            badges.push({
+              title: 'Parent Card',
+              text: parentCard.name,
+              callback: function(t) {
+                window.location.href = `https://trello.com/c/${parentId}`;
+              }
+            });
+          }
           return badges;
         });
       }
