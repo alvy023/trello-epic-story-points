@@ -8,6 +8,7 @@
     <script>
         var t = TrelloPowerUp.iframe();
 
+        // Fetch the list of cards to select as a parent
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             return t.cards('id', 'name', 'idList').then(function(cards) {
                 var epicsCards = cards.filter(card => card.idList === epicsListId);
@@ -25,17 +26,54 @@
             var select = document.getElementById("parentCardSelect");
             var parentId = select.value;
             var parentName = select.options[select.selectedIndex].text;
-            t.set('card', 'shared', {
-                parentCardId: parentId,
-                parentCardName: parentName
-            }).then(() => {
-                t.closePopup();
+
+            if (!parentId) return;
+
+            t.get('card', 'id').then(function(card) {
+                return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
+                    var updates = [
+                        t.set('card', 'shared', {
+                            parentCardId: parentId,
+                            parentCardName: parentName
+                        }),
+                        t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                            boardChildren = boardChildren || {};
+                            
+                            // Remove from old parent
+                            if (oldParentId && boardChildren[oldParentId]) {
+                                boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
+                            }
+                            
+                            // Add to new parent
+                            boardChildren[parentId] = boardChildren[parentId] || [];
+                            if (!boardChildren[parentId].some(c => c.id === card.id)) {
+                                boardChildren[parentId].push({ id: card.id, name: card.name });
+                            }
+
+                            return t.set('board', 'shared', 'childCards', boardChildren);
+                        })
+                    ];
+                    
+                    return Promise.all(updates).then(() => t.closePopup());
+                });
             });
         }
 
         function removeParent() {
-            t.remove('card', 'shared', ['parentCardId', 'parentCardName']).then(() => {
-                t.closePopup();
+            t.get('card', 'id').then(function(card) {
+                return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
+                    var updates = [
+                        t.remove('card', 'shared', ['parentCardId', 'parentCardName']),
+                        t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                            if (oldParentId && boardChildren && boardChildren[oldParentId]) {
+                                boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
+                                return t.set('board', 'shared', 'childCards', boardChildren);
+                            }
+                        })
+                    ];
+
+                    return Promise.all(updates).then(() => t.closePopup());
+                });
             });
         }
     </script>
