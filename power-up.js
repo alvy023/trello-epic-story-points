@@ -24,8 +24,8 @@ TrelloPowerUp.initialize({
   'card-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.get('card', 'shared', 'parentCard')
-    ]).then(function([points, parentId]) {
+      t.get('card', 'shared', 'parentCardName')
+    ]).then(function([points, parentName]) {
       const badges = [];
       if (points) {
         badges.push({
@@ -33,18 +33,10 @@ TrelloPowerUp.initialize({
           color: 'blue'
         });
       }
-      if (parentId) {
-        return t.get('board', 'shared', 'cards').then(function(cards) {
-          if (cards) {
-            const parentCard = cards.find(card => card.id === parentId);
-            if (parentCard) {
-              badges.push({
-                text: 'Parent: ' + parentCard.name,
-                color: 'green'
-              });
-            }
-          }
-          return badges;
+      if (parentName) {
+        badges.push({
+          text: 'Parent: ' + parentName,
+          color: 'green'
         });
       }
       return badges;
@@ -54,8 +46,8 @@ TrelloPowerUp.initialize({
   'card-detail-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.get('card', 'shared', 'parentCard')
-    ]).then(function([points, parentId]) {
+      t.get('card', 'shared', 'parentCardName')
+    ]).then(function([points, parentName]) {
       const badges = [];
       if (points) {
         badges.push({
@@ -64,21 +56,10 @@ TrelloPowerUp.initialize({
           color: 'blue'
         });
       }
-      if (parentId) {
-        return t.get('board', 'shared', 'cards').then(function(cards) {
-          if (cards) {
-            const parentCard = cards.find(card => card.id === parentId);
-            if (parentCard) {
-              badges.push({
-                title: 'Parent Card',
-                text: parentCard.name,
-                callback: function(t) {
-                  window.location.href = `https://trello.com/c/${parentId}`;
-                }
-              });
-            }
-          }
-          return badges;
+      if (parentName) {
+        badges.push({
+          title: 'Parent Card',
+          text: parentName
         });
       }
       return badges;

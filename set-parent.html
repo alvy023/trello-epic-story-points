@@ -22,14 +22,19 @@
         });
 
         function saveParent() {
-            var parentId = document.getElementById("parentCardSelect").value;
-            t.set('card', 'shared', 'parentCard', parentId).then(() => {
+            var select = document.getElementById("parentCardSelect");
+            var parentId = select.value;
+            var parentName = select.options[select.selectedIndex].text;
+            t.set('card', 'shared', {
+                parentCardId: parentId,
+                parentCardName: parentName
+            }).then(() => {
                 t.closePopup();
             });
         }
 
         function removeParent() {
-            t.remove('card', 'shared', 'parentCard').then(() => {
+            t.remove('card', 'shared', ['parentCardId', 'parentCardName']).then(() => {
                 t.closePopup();
             });
         }
