@@ -52,6 +52,14 @@ TrelloPowerUp.initialize({
       });
   },
 
+  'show-settings': function(t, options) {
+    return t.popup({
+      title: 'Settings',
+      url: 'settings.html',
+      height: 184
+    });
+  },
+
   'on-enable': function(t, options) {
     console.log('Power-Up enabled');
   },
@@ -60,4 +68,3 @@ TrelloPowerUp.initialize({
     console.log('Power-Up disabled');
   }
 });
-

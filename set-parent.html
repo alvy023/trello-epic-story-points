@@ -8,9 +8,28 @@
     <script>
         var t = TrelloPowerUp.iframe();
 
+        t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
+            return t.cards('id', 'name', 'idList').then(function(cards) {
+                var epicsCards = cards.filter(card => card.idList === epicsListId);
+                var select = document.getElementById("parentCardSelect");
+                epicsCards.forEach(card => {
+                    var option = document.createElement("option");
+                    option.value = card.id;
+                    option.text = card.name;
+                    select.add(option);
+                });
+            });
+        });
+
         function saveParent() {
-            var parentId = document.getElementById("parentCardId").value;
+            var parentId = document.getElementById("parentCardSelect").value;
             t.set('card', 'shared', 'parentCard', parentId).then(() => {
+                t.closePopup();
+            });
+        }
+
+        function removeParent() {
+            t.remove('card', 'shared', 'parentCard').then(() => {
                 t.closePopup();
             });
         }
@@ -18,7 +37,10 @@
 </head>
 <body>
     <h2>Set Parent Card</h2>
-    <input type="text" id="parentCardId" placeholder="Enter Parent Card ID" />
+    <select id="parentCardSelect">
+        <option value="">Select Parent Card</option>
+    </select>
     <button onclick="saveParent()">Save</button>
+    <button onclick="removeParent()">Remove</button>
 </body>
 </html>
