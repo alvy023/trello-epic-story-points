@@ -46,8 +46,9 @@ TrelloPowerUp.initialize({
   'card-detail-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.get('card', 'shared', ['parentCardId', 'parentCardName'])
-    ]).then(function([points, data]) {
+      t.get('card', 'shared', 'parentCardId'),
+      t.get('card', 'shared', 'parentCardName')
+    ]).then(function([points, parentId, parentName]) {
         const badges = [];
         if (points) {
           badges.push({
@@ -55,12 +56,12 @@ TrelloPowerUp.initialize({
             text: points
           });
         }
-        if (data.parentCardId && data.parentCardName) {
+        if (parentId && parentName) {
           badges.push({
             title: 'Parent Card',
-            text: data.parentCardName,
+            text: parentName,
             callback: function(t) {
-              return t.navigate({ url: `https://trello.com/c/${data.parentCardId}` });
+              return t.navigate({ url: `https://trello.com/c/${parentId}` });
             }
           });
         }
