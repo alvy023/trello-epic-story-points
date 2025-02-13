@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Cards</title>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+        var t = TrelloPowerUp.iframe();
+
+        t.get('card', 'id').then(function(parentId) {
+            return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                var children = (boardChildren && boardChildren[parentId]) || [];
+                var listContainer = document.getElementById("childCardsList");
+
+                if (children.length === 0) {
+                    listContainer.innerHTML = "<p>No child cards linked.</p>";
+                    return;
+                }
+
+                children.forEach(function(child) {
+                    var listItem = document.createElement("li");
+                    var link = document.createElement("a");
+                    link.href = `https://trello.com/c/${child.id}`;
+                    link.target = "_blank";
+                    link.textContent = child.name;
+                    listItem.appendChild(link);
+                    listContainer.appendChild(listItem);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>Child Cards</h2>
+    <ul id="childCardsList"></ul>
+</body>
+</html>
