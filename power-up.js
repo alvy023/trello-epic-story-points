@@ -43,30 +43,40 @@ TrelloPowerUp.initialize({
     });
   },
 
-  'card-detail-badges': function(t, options) {
+  'card-detail-badges': function (t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
       t.get('card', 'shared', 'parentCardId'),
       t.get('card', 'shared', 'parentCardName')
-    ]).then(function([points, parentId, parentName]) {
-        const badges = [];
-        if (points) {
-          badges.push({
-            title: 'Story Points',
-            text: points
-          });
-        }
-        if (parentId && parentName) {
-          badges.push({
-            title: 'Parent Card',
-            text: parentName,
-            callback: function(t) {
-              return t.navigate({ url: `https://trello.com/c/${parentId}` });
-            }
-          });
-        }
-        return badges;
-      });
+    ]).then(function ([points, parentCardId, parentCardName]) {
+      const badges = [];
+
+      if (points) {
+        badges.push({
+          title: 'Story Points',
+          text: points + ' SP',
+          color: 'blue'
+        });
+      }
+
+      if (parentCardId && parentCardName) {
+        badges.push({
+          title: 'Parent Card',
+          text: parentCardName,
+          callback: function (t) {
+            return t.navigate({
+              url: `https://trello.com/c/${parentCardId}`,
+              target: 'current'
+            });
+          }
+        });
+      }
+
+      return badges;
+    }).catch(error => {
+      console.error('Error in card-detail-badges:', error);
+      return [];
+    });
   },
 
   'card-back-section': function(t, options) {
