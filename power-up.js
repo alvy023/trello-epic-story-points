@@ -79,20 +79,22 @@ TrelloPowerUp.initialize({
     });
   },
 
-  'card-back-section': function(t, options) {
-    return t.get('card', 'shared', 'childCards').then(function(children) {
-      if (children && children.length > 0) {
-        return {
-          title: 'Child Cards',
+  'attachment-sections': function (t, options) {
+    return t.get('card', 'shared', 'childCardIds', []).then(function (childCardIds) {
+      if (childCardIds.length === 0) {
+        return [];
+      }
+      return [
+        {
+          claimed: childCardIds.map(id => `https://trello.com/c/${id}`),
           icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
+          title: 'Child Cards',
           content: {
             type: 'iframe',
-            url: t.signUrl('child-cards.html'),
-            height: 200
+            url: t.signUrl('attachments.html')
           }
-        };
-      }
-      return null;
+        }
+      ];
     });
   },
 
