@@ -13,7 +13,7 @@
         // Fetch the list of cards to select as a parent
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             console.log('Epics List ID:', epicsListId);
-            return t.cards('id', 'name', 'idList').then(function(epicsCards) {
+            return t.cards('id', 'name', epicsListId).then(function(epicsCards) {
                 console.log('Epics Cards:', epicsCards);
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
