@@ -92,7 +92,7 @@ TrelloPowerUp.initialize({
             icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
             content: {
               type: 'iframe',
-              url: t.signUrl('child-cards.html')
+              url: t.signUrl('./child-cards.html')
             }
           }
         ];

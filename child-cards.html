@@ -8,7 +8,7 @@
     <script>
         var t = TrelloPowerUp.iframe();
 
-        t.card('id', 'card').then(function(card) {
+        t.card('id').then(function(card) {
             return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
                 var listContainer = document.getElementById("childCardsList");
