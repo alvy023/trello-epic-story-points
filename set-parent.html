@@ -14,7 +14,7 @@
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             console.log('Epics List ID:', epicsListId);
             return t.cards('id', 'name', 'idList').then(function(cards) {
-                console.log('Epics Cards:', epicsCards);
+                var epicsCards = cards.filter(card => card.idList === epicsListId);
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
                     var option = document.createElement("option");
