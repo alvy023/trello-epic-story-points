@@ -80,7 +80,7 @@ TrelloPowerUp.initialize({
   },
 
   'card-back-section': function (t, options) {
-    return t.card('id', 'card').then(function(card) {
+    return t.card('id').then(function(card) {
       return t.get('board', 'shared', 'childCards').then(function (boardChildren) {
         var children = (boardChildren && boardChildren[card.id]) || [];
         if (children.length === 0) {

@@ -12,8 +12,8 @@
 
         // Fetch the list of cards to select as a parent
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
-            console.log('Epics List ID:', epicsListId);
-            return t.cards('id', 'name', epicsListId).then(function(epicsCards) {
+            return t.cards('all').then(function(cards) {
+                var epicsCards = cards.filter(card => card.idList === epicsListId);
                 console.log('Epics Cards:', epicsCards);
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
@@ -22,7 +22,11 @@
                     option.text = card.name;
                     select.add(option);
                 });
+            }).catch(function(error) {
+                console.error('Error fetching cards:', error);
             });
+        }).catch(function(error) {
+            console.error('Error fetching epics list ID:', error);
         });
 
         function saveParent() {
@@ -69,6 +73,8 @@
                         t.closePopup();
                     });
                 });
+            }).catch(function(error) {
+                console.error('Error saving parent:', error);
             });
         }
 
@@ -93,6 +99,8 @@
                         t.closePopup();
                     });
                 });
+            }).catch(function(error) {
+                console.error('Error removing parent:', error);
             });
         }
     </script>
