@@ -8,12 +8,16 @@
     <script>
         var t = TrelloPowerUp.iframe();
 
+        console.log('Power-Up iframe initialized');
+
         // Fetch the list of cards to select as a parent
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
+            console.log('Epics List ID:', epicsListId);
             return t.cards('id', 'name', 'idList').then(function(cards) {
-                var epicsCards = cards.filter(card => card.idList === epicsListId);
+                console.log('Epics Cards:', epicsCards);
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
+                    var option = document.createElement("option");
                     option.value = card.id;
                     option.text = card.name;
                     select.add(option);
@@ -26,10 +30,15 @@
             var parentId = select.value;
             var parentName = select.options[select.selectedIndex].text;
 
+            console.log('Selected Parent ID:', parentId);
+            console.log('Selected Parent Name:', parentName);
+
             if (!parentId) return;
 
             t.card('id', 'name').then(function(card) {
+                console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
+                    console.log('Old Parent ID:', oldParentId);
                     var updates = [
                         t.set('card', 'shared', {
                             parentCardId: parentId,
@@ -55,14 +64,19 @@
                         })
                     ];
 
-                    return Promise.all(updates).then(() => t.closePopup());
+                    return Promise.all(updates).then(() => {
+                        console.log('Parent saved successfully');
+                        t.closePopup();
+                    });
                 });
             });
         }
 
         function removeParent() {
             t.card('id', 'name').then(function(card) {
+                console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
+                    console.log('Old Parent ID:', oldParentId);
                     var updates = [
                         t.remove('card', 'shared', ['parentCardId', 'parentCardName']),
                         t.get('board', 'shared', 'childCards').then(function(boardChildren) {
@@ -74,7 +88,10 @@
                         })
                     ];
 
-                    return Promise.all(updates).then(() => t.closePopup());
+                    return Promise.all(updates).then(() => {
+                        console.log('Parent removed successfully');
+                        t.closePopup();
+                    });
                 });
             });
         }
