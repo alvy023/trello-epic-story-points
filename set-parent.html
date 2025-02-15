@@ -14,7 +14,6 @@
                 var epicsCards = cards.filter(card => card.idList === epicsListId);
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
-                    var option = document.createElement("option");
                     option.value = card.id;
                     option.text = card.name;
                     select.add(option);
@@ -38,22 +37,24 @@
                         }),
                         t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                             boardChildren = boardChildren || {};
-            
+
                             // Remove from old parent
                             if (oldParentId && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
+                                console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
                             }
-            
+
                             // Add to new parent
                             boardChildren[parentId] = boardChildren[parentId] || [];
                             if (!boardChildren[parentId].some(c => c.id === card.id)) {
                                 boardChildren[parentId].push({ id: card.id, name: card.name });
+                                console.log('Added to new parent:', parentId, boardChildren[parentId]);
                             }
-            
+
                             return t.set('board', 'shared', 'childCards', boardChildren);
                         })
                     ];
-                    
+
                     return Promise.all(updates).then(() => t.closePopup());
                 });
             });
@@ -67,6 +68,7 @@
                         t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                             if (oldParentId && boardChildren && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
+                                console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
                                 return t.set('board', 'shared', 'childCards', boardChildren);
                             }
                         })
