@@ -10,7 +10,6 @@
 
         console.log('Power-Up iframe initialized');
 
-        // Fetch the list of cards to select as a parent
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             return t.cards('all').then(function(cards) {
                 var epicsCards = cards.filter(card => card.idList === epicsListId);
@@ -18,7 +17,6 @@
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
                     var option = document.createElement("option");
-                    option.value = card.id;
                     option.text = card.name;
                     select.add(option);
                 });
@@ -51,13 +49,11 @@
                         t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                             boardChildren = boardChildren || {};
 
-                            // Remove from old parent
                             if (oldParentId && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
                                 console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
                             }
 
-                            // Add to new parent
                             boardChildren[parentId] = boardChildren[parentId] || [];
                             if (!boardChildren[parentId].some(c => c.id === card.id)) {
                                 boardChildren[parentId].push({ id: card.id, name: card.name });
@@ -80,6 +76,7 @@
         }
 
         function updateParentCard(parentId) {
+            console.log('Updating parent card:', parentId);
             t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = boardChildren[parentId] || [];
                 var totalPoints = 0;
@@ -88,10 +85,12 @@
                     return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
                         points = parseInt(points, 10) || 0;
                         totalPoints += points;
+                        console.log('Child:', child, 'Points:', points, 'Total Points:', totalPoints);
                     });
                 });
 
                 Promise.all(promises).then(function() {
+                    console.log('Total Points for Parent:', totalPoints);
                     t.set('card', 'shared', 'totalPoints', totalPoints, { card: parentId });
                 }).catch(function(error) {
                     console.error('Error updating parent card:', error);

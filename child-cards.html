@@ -9,8 +9,10 @@
         var t = TrelloPowerUp.iframe();
 
         t.card('id').then(function(card) {
+            console.log('Current Card:', card);
             return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
+                console.log('Child Cards:', children);
                 var listContainer = document.getElementById("childCardsList");
                 var totalPoints = 0;
 
@@ -23,6 +25,7 @@
                         var tempContainer = document.createElement("div");
                         points = parseInt(points, 10) || 0;
                         totalPoints += points;
+                        console.log('Child:', child, 'Points:', points, 'Total Points:', totalPoints);
                         var listItem = document.createElement("li");
                         var link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
@@ -43,6 +46,7 @@
                     var totalPointsElement = document.createElement("h3");
                     totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
                     listContainer.insertBefore(totalPointsElement, listContainer.firstChild);
+                    console.log('Total Points Element:', totalPointsElement);
                 }).catch(function(error) {
                     console.error('Error fetching story points:', error);
                 });

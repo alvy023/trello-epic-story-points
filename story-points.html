@@ -10,10 +10,13 @@
 
         function savePoints() {
             var points = document.getElementById("storyPoints").value;
+            console.log('Saving Points:', points);
             t.card('id').then(function(card) {
+                console.log('Current Card:', card);
                 return t.set('card', 'shared', 'storyPoints', points).then(() => {
                     t.get('card', 'shared', 'parentCardId').then(function(parentId) {
                         if (parentId) {
+                            console.log('Updating Parent Card:', parentId);
                             updateParentCard(parentId);
                         }
                         t.closePopup();
@@ -23,10 +26,13 @@
         }
 
         function removePoints() {
+            console.log('Removing Points');
             t.card('id').then(function(card) {
+                console.log('Current Card:', card);
                 return t.remove('card', 'shared', 'storyPoints').then(() => {
                     t.get('card', 'shared', 'parentCardId').then(function(parentId) {
                         if (parentId) {
+                            console.log('Updating Parent Card:', parentId);
                             updateParentCard(parentId);
                         }
                         t.closePopup();
@@ -36,6 +42,7 @@
         }
 
         function updateParentCard(parentId) {
+            console.log('Updating parent card:', parentId);
             t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = boardChildren[parentId] || [];
                 var totalPoints = 0;
@@ -44,10 +51,12 @@
                     return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
                         points = parseInt(points, 10) || 0;
                         totalPoints += points;
+                        console.log('Child:', child, 'Points:', points, 'Total Points:', totalPoints);
                     });
                 });
 
                 Promise.all(promises).then(function() {
+                    console.log('Total Points for Parent:', totalPoints);
                     t.set('card', 'shared', 'totalPoints', totalPoints, { card: parentId });
                 }).catch(function(error) {
                     console.error('Error updating parent card:', error);
