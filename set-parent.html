@@ -31,7 +31,7 @@
         function saveParent() {
             var select = document.getElementById("parentCardSelect");
             var parentId = select.value;
-            var parentName = select.text;
+            var parentName = select.options[select.selectedIndex].text;
 
             console.log('Selected Parent ID:', parentId);
             console.log('Selected Parent Name:', parentName);

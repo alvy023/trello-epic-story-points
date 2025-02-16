@@ -13,6 +13,7 @@
             return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
                 console.log('Child Cards:', children);
+                var listContainer = document.getElementById("childCardsList");
                 var totalPoints = 0;
 
                 if (children.length === 0) {
