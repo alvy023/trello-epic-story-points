@@ -11,20 +11,31 @@
         t.card('id').then(function(card) {
             return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
-                var listContainer = document.getElementById("childCardsList");
+                var totalPoints = 0;
 
                 if (children.length === 0) {
                     return;
                 }
 
-                children.forEach(function(child) {
-                    var listItem = document.createElement("li");
-                    var link = document.createElement("a");
-                    link.href = `https://trello.com/c/${child.id}`;
-                    link.target = "_blank";
-                    link.textContent = child.name;
-                    listItem.appendChild(link);
-                    listContainer.appendChild(listItem);
+                var promises = children.map(function(child) {
+                    return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
+                        totalPoints += parseInt(points || 0, 10);
+                        var listItem = document.createElement("li");
+                        var link = document.createElement("a");
+                        link.href = `https://trello.com/c/${child.id}`;
+                        link.target = "_blank";
+                        link.textContent = `${child.name} (${points || 0} SP)`;
+                        listItem.appendChild(link);
+                        listContainer.appendChild(listItem);
+                    });
+                });
+
+                Promise.all(promises).then(function() {
+                    var totalPointsElement = document.createElement("h3");
+                    totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
+                    listContainer.insertBefore(totalPointsElement, listContainer.firstChild);
+                }).catch(function(error) {
+                    console.error('Error fetching story points:', error);
                 });
             });
         });
