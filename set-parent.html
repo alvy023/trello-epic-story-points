@@ -17,6 +17,7 @@
                 var select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
                     var option = document.createElement("option");
+                    option.value = card.id;
                     option.text = card.name;
                     select.add(option);
                 });
@@ -30,7 +31,7 @@
         function saveParent() {
             var select = document.getElementById("parentCardSelect");
             var parentId = select.value;
-            var parentName = select.options[select.selectedIndex].text;
+            var parentName = select.text;
 
             console.log('Selected Parent ID:', parentId);
             console.log('Selected Parent Name:', parentName);
