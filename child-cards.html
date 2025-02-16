@@ -20,6 +20,7 @@
 
                 var promises = children.map(function(child) {
                     return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
+                        var tempContainer = document.createElement("div");
                         totalPoints += parseInt(points || 0, 10);
                         var listItem = document.createElement("li");
                         var link = document.createElement("a");
@@ -27,11 +28,17 @@
                         link.target = "_blank";
                         link.textContent = `${child.name} (${points || 0} SP)`;
                         listItem.appendChild(link);
-                        listContainer.appendChild(listItem);
+                        tempContainer.appendChild(listItem);
+                        return tempContainer;
                     });
                 });
 
-                Promise.all(promises).then(function() {
+                Promise.all(promises).then(function(tempContainers) {
+                    tempContainers.forEach(function(tempContainer) {
+                        while (tempContainer.firstChild) {
+                            listContainer.appendChild(tempContainer.firstChild);
+                        }
+                    });
                     var totalPointsElement = document.createElement("h3");
                     totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
                     listContainer.insertBefore(totalPointsElement, listContainer.firstChild);
