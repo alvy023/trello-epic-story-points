@@ -13,7 +13,6 @@
             return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
                 console.log('Child Cards:', children);
-                var listContainer = document.getElementById("childCardsList");
                 var totalPoints = 0;
 
                 if (children.length === 0) {
@@ -22,6 +21,7 @@
 
                 var promises = children.map(function(child) {
                     return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
+                        console.log('Retrieved Points for Child:', child.id, points);
                         var tempContainer = document.createElement("div");
                         points = parseInt(points, 10) || 0;
                         totalPoints += points;
@@ -34,6 +34,8 @@
                         listItem.appendChild(link);
                         tempContainer.appendChild(listItem);
                         return tempContainer;
+                    }).catch(function(error) {
+                        console.error('Error retrieving points for child:', child.id, error);
                     });
                 });
 
