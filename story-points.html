@@ -10,14 +10,48 @@
 
         function savePoints() {
             var points = document.getElementById("storyPoints").value;
-            t.set('card', 'shared', 'storyPoints', points).then(() => {
-                t.closePopup();
+            t.card('id').then(function(card) {
+                return t.set('card', 'shared', 'storyPoints', points).then(() => {
+                    t.get('card', 'shared', 'parentCardId').then(function(parentId) {
+                        if (parentId) {
+                            updateParentCard(parentId);
+                        }
+                        t.closePopup();
+                    });
+                });
             });
         }
 
         function removePoints() {
-            t.remove('card', 'shared', 'storyPoints').then(() => {
-                t.closePopup();
+            t.card('id').then(function(card) {
+                return t.remove('card', 'shared', 'storyPoints').then(() => {
+                    t.get('card', 'shared', 'parentCardId').then(function(parentId) {
+                        if (parentId) {
+                            updateParentCard(parentId);
+                        }
+                        t.closePopup();
+                    });
+                });
+            });
+        }
+
+        function updateParentCard(parentId) {
+            t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                var children = boardChildren[parentId] || [];
+                var totalPoints = 0;
+
+                var promises = children.map(function(child) {
+                    return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
+                        points = parseInt(points, 10) || 0;
+                        totalPoints += points;
+                    });
+                });
+
+                Promise.all(promises).then(function() {
+                    t.set('card', 'shared', 'totalPoints', totalPoints, { card: parentId });
+                }).catch(function(error) {
+                    console.error('Error updating parent card:', error);
+                });
             });
         }
     </script>

@@ -71,10 +71,31 @@
                     return Promise.all(updates).then(() => {
                         console.log('Parent saved successfully');
                         t.closePopup();
+                        updateParentCard(parentId);
                     });
                 });
             }).catch(function(error) {
                 console.error('Error saving parent:', error);
+            });
+        }
+
+        function updateParentCard(parentId) {
+            t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                var children = boardChildren[parentId] || [];
+                var totalPoints = 0;
+
+                var promises = children.map(function(child) {
+                    return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
+                        points = parseInt(points, 10) || 0;
+                        totalPoints += points;
+                    });
+                });
+
+                Promise.all(promises).then(function() {
+                    t.set('card', 'shared', 'totalPoints', totalPoints, { card: parentId });
+                }).catch(function(error) {
+                    console.error('Error updating parent card:', error);
+                });
             });
         }
 
@@ -97,6 +118,7 @@
                     return Promise.all(updates).then(() => {
                         console.log('Parent removed successfully');
                         t.closePopup();
+                        updateParentCard(oldParentId);
                     });
                 });
             }).catch(function(error) {
