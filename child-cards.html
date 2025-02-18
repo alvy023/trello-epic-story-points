@@ -24,9 +24,11 @@
                     return t.get(child.id, 'shared', 'storyPoints').then(function(points) {
 
                         console.log('Retrieved Child:', child.id);
-                        console.log('Retrieved Points for Child:', points);
-                        var pointsInt = parseInt(points.toString(), 10);
-                        totalPoints += pointsInt;
+                        if (points) {
+                            console.log('Retrieved Points for Child:', points);
+                            var pointsInt = parseInt(points.toString(), 10);
+                            totalPoints += pointsInt;
+                        }
                         console.log('Total Points:', totalPoints);
                         t.set(card.id, 'shared', 'totalPoints', totalPoints);
                         var totalPointsElement = document.getElementById("totalPoints");
