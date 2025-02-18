@@ -53,8 +53,8 @@
                 return Promise.all(
                     children.map(child =>
                         t.get(child.id, "shared", "storyPoints").then(points => {
-                            // points = parseInt(points, 10) || 0; // Ensure points is a number
-                            totalPoints += points;
+                            var pointsInt = parseInt(points.toString(), 10);
+                            totalPoints += pointsInt;
                         })
                     )
                 ).then(() => {
