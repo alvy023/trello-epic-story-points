@@ -43,9 +43,9 @@
                     });
                 });
 
-                t.set('card', 'shared', 'totalPoints', totalPoints);
+                t.set(card.id, 'shared', 'totalPoints', totalPoints);
                 console.log('Total Points:', totalPoints);
-                var totalPointsElement = document.createElement("totalPoints");
+                var totalPointsElement = document.getElementById("totalPoints");
                 totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
 
                 Promise.all(promises).then(function(tempContainers) {
