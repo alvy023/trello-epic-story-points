@@ -76,29 +76,6 @@
             });
         }
 
-        function updateParentCard(parentId) {
-            console.log('Updating parent card:', parentId);
-            t.get('board', 'shared', 'childCards').then(function(boardChildren) {
-                var children = boardChildren[parentId] || [];
-                var totalPoints = 0;
-
-                var promises = children.map(function(child) {
-                    return t.get('card', 'shared', 'storyPoints', { card: child.id }).then(function(points) {
-                        points = parseInt(points, 10) || 0;
-                        totalPoints += points;
-                        console.log('Child:', child, 'Points:', points, 'Total Points:', totalPoints);
-                    });
-                });
-
-                Promise.all(promises).then(function() {
-                    console.log('Total Points for Parent:', totalPoints);
-                    t.set('card', 'shared', 'totalPoints', totalPoints, { card: parentId });
-                }).catch(function(error) {
-                    console.error('Error updating parent card:', error);
-                });
-            });
-        }
-
         function removeParent() {
             t.card('id', 'name').then(function(card) {
                 console.log('Current Card:', card);
@@ -125,6 +102,30 @@
                 console.error('Error removing parent:', error);
             });
         }
+
+        function updateParentCard(parentId) {
+            return t.get('board', 'shared', 'childCards').then(function (boardChildren) {
+                if (!boardChildren || !boardChildren[parentId]) {
+                    return Promise.resolve(); // No children for this parent, nothing to update
+                }
+
+                const children = boardChildren[parentId];
+                let totalPoints = 0;
+
+                return Promise.all(
+                    children.map(child =>
+                        t.get(child.id, "shared", "storyPoints").then(points => {
+                            points = parseInt(points, 10) || 0; // Ensure points is a number
+                            totalPoints += points;
+                        })
+                    )
+                ).then(() => {
+                    // Set the total story points on the parent card
+                    return t.set(parentId, "shared", "totalPoints", totalPoints);
+                });
+            });
+        }
+
     </script>
 </head>
 <body>
