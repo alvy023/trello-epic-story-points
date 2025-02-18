@@ -28,6 +28,9 @@
                         var pointsInt = parseInt(points.toString(), 10);
                         totalPoints += pointsInt;
                         console.log('Total Points:', totalPoints);
+                        t.set(card.id, 'shared', 'totalPoints', totalPoints);
+                        var totalPointsElement = document.getElementById("totalPoints");
+                        totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
 
                         var tempContainer = document.createElement("div");
                         var listItem = document.createElement("li");
@@ -53,11 +56,6 @@
                 }).catch(function(error) {
                     console.error('Error fetching story points:', error);
                 });
-
-                t.set(card.id, 'shared', 'totalPoints', totalPoints);
-                console.log('Total Points:', totalPoints);
-                var totalPointsElement = document.getElementById("totalPoints");
-                totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
             });
         });
     </script>
