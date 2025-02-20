@@ -29,6 +29,7 @@
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                         }
+                        console.log('Child Points:', pointsInt);
                         console.log('Total Points:', totalPoints);
                         t.set(card.id, 'shared', 'totalPoints', totalPoints);
                         var totalPointsElement = document.getElementById("totalPoints");
