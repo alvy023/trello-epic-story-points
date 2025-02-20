@@ -22,11 +22,11 @@
 
                 var promises = children.map(function(child) {
                     return t.get(child.id, 'shared', 'storyPoints').then(function(points) {
-
                         console.log('Retrieved Child:', child.id);
+                        var pointsInt = 0;
                         if (points) {
                             console.log('Retrieved Points for Child:', points);
-                            var pointsInt = parseInt(points.toString(), 10);
+                            pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                         }
                         console.log('Total Points:', totalPoints);
@@ -39,7 +39,7 @@
                         var link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
                         link.target = "_blank";
-                        link.textContent = ` [${points} SP] - ${child.name}`;
+                        link.textContent = ` [${pointsInt} SP] - ${child.name}`;
                         listItem.appendChild(link);
                         tempContainer.appendChild(listItem);
                         return tempContainer;
