@@ -10,55 +10,62 @@
 
         t.card('id').then(function(card) {
             console.log('Current Card:', card);
-            return t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+            return Promise.all([
+                t.get('board', 'shared', 'childCards'),
+                t.get('board', 'shared', 'completedListId')
+            ]).then(function([boardChildren, completedListId]) {
                 var children = (boardChildren && boardChildren[card.id]) || [];
                 console.log('Child Cards:', children);
                 var listContainer = document.getElementById("childCardsList");
                 var totalPoints = 0;
+                var nonCompletedPoints = 0;
 
                 if (children.length === 0) {
-                    return;
+                    return; // Early exit if no children
                 }
 
-                var promises = children.map(function(child) {
-                    return t.get(child.id, 'shared', 'storyPoints').then(function(points) {
+                // Use for...of loop for cleaner iteration
+                for (const child of children) {  // Changed to for...of
+                    Promise.all([
+                        t.get(child.id, 'shared', 'storyPoints'),
+                        t.get(child.id, 'shared', 'idList')
+                    ]).then(function([points, idList]) {
                         console.log('Retrieved Child:', child.id);
-                        var pointsInt = 0;
+                        let pointsInt = 0; // Use let for block scoping
                         if (points) {
                             console.log('Retrieved Points for Child:', points);
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
+                            if (idList !== completedListId) {
+                                nonCompletedPoints += pointsInt;
+                            }
                         }
                         console.log('Child Points:', pointsInt);
                         console.log('Total Points:', totalPoints);
-                        t.set(card.id, 'shared', 'totalPoints', totalPoints);
-                        var totalPointsElement = document.getElementById("totalPoints");
-                        totalPointsElement.textContent = `Total Story Points: ${totalPoints}`;
 
-                        var tempContainer = document.createElement("div");
+                        // Update the card badge less frequently.  Do this outside the loop.
+                        // t.set(card.id, 'shared', 'totalPoints', `${nonCompletedPoints} / ${totalPoints}`);  // Removed from inside loop
+
                         var listItem = document.createElement("li");
                         var link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
                         link.target = "_blank";
                         link.textContent = ` [${pointsInt} SP] - ${child.name}`;
                         listItem.appendChild(link);
-                        tempContainer.appendChild(listItem);
-                        return tempContainer;
+                        listContainer.appendChild(listItem); // Append directly to the list
+                        
+                        if (children.indexOf(child) === children.length -1) { //Check if last child
+                            t.set(card.id, 'shared', 'totalPoints', `${nonCompletedPoints} / ${totalPoints}`); //Set card badge after all children are processed
+                            var totalPointsElement = document.getElementById("totalPoints");
+                            totalPointsElement.textContent = `Total Story Points: ${nonCompletedPoints} / ${totalPoints}`;
+                        }
 
                     }).catch(function(error) {
                         console.error('Error retrieving points for child:', child.id, error);
                     });
-                });
-
-                Promise.all(promises).then(function(tempContainers) {
-                    tempContainers.forEach(function(tempContainer) {
-                        while (tempContainer.firstChild) {
-                            listContainer.appendChild(tempContainer.firstChild);
-                        }
-                    });
-                }).catch(function(error) {
-                    console.error('Error fetching story points:', error);
-                });
+                }
+            }).catch(function(error) {
+                console.error('Error fetching story points:', error);
             });
         });
     </script>
