@@ -2,7 +2,8 @@
   "capabilities": {
     "card-buttons": true,
     "card-badges": true,
-    "card-detail-badges": true
+    "card-detail-badges": true,
+    "card-back-section": true
   },
   "connectors": {
     "iframe": {
