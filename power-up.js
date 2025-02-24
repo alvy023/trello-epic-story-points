@@ -52,7 +52,12 @@ TrelloPowerUp.initialize({
         badges.push({
           text: totalPoints,
           color: 'green'
+        });
+      }
       return badges;
+    }).catch(error => {
+      console.error('Error in card-badges:', error);
+      return [];
     });
   },
 
