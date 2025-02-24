@@ -6,23 +6,43 @@
     <title>Settings</title>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        var t = TrelloPowerUp.iframe();
+        const t = TrelloPowerUp.iframe(); // Use const for t
 
-        t.lists('id', 'name').then(function(lists) {
-            var select = document.getElementById("epicsListSelect");
-            lists.forEach(list => {
-                var option = document.createElement("option");
-                option.value = list.id;
-                option.text = list.name;
-                select.add(option);
+        t.lists('id', 'name').then(lists => { // Use arrow function
+            const epicsSelect = document.getElementById("epicsListSelect");
+            const completedSelect = document.getElementById("completedListSelect");
+
+            // Populate select elements with existing values if present
+            Promise.all([
+                t.get('board', 'shared', 'epicsListId'),
+                t.get('board', 'shared', 'completedListId')
+            ]).then(([savedEpicsListId, savedCompletedListId]) => {
+                lists.forEach(list => {
+                    const epicsOption = document.createElement("option");
+                    epicsOption.value = list.id;
+                    epicsOption.text = list.name;
+                    epicsSelect.add(epicsOption);
+                    if (list.id === savedEpicsListId) {
+                        epicsOption.selected = true;
+                    }
+
+                    const completedOption = document.createElement("option");
+                    completedOption.value = list.id;
+                    completedOption.text = list.name;
+                    completedSelect.add(completedOption);
+                    if (list.id === savedCompletedListId) {
+                        completedOption.selected = true;
+                    }
+                });
             });
         });
 
         function saveSettings() {
-            var epicsListId = document.getElementById("epicsListSelect").value;
-            t.set('board', 'shared', 'epicsListId', epicsListId).then(() => {
-                t.closePopup();
-            });
+            const epicsListId = document.getElementById("epicsListSelect").value;
+            const completedListId = document.getElementById("completedListSelect").value;
+            t.set('board', 'shared', 'epicsListId', epicsListId)
+                .then(() => t.set('board', 'shared', 'completedListId', completedListId)) // Chain promises
+                .then(() => t.closePopup()); // Close popup after both settings are saved
         }
     </script>
 </head>
@@ -30,6 +50,9 @@
     <h2>Settings</h2>
     <select id="epicsListSelect">
         <option value="">Select Epics List</option>
+    </select>
+    <select id="completedListSelect">
+        <option value="">Select Completed List</option>
     </select>
     <button onclick="saveSettings()">Save</button>
 </body>
