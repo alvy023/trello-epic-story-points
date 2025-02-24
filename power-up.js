@@ -24,21 +24,34 @@ TrelloPowerUp.initialize({
   'card-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
-      t.get('card', 'shared', 'parentCardName')
-    ]).then(function([points, parentName]) {
+      t.get('card', 'shared', 'parentCardName'),
+      t.get('card', 'shared', 'totalPoints'),
+      t.get('board', 'shared', 'epicsListId'),
+      t.get('card', 'idList')
+    ]).then(function([points, parentName, totalPoints, epicsListId, idList]) {
       const badges = [];
-      if (points) {
-        badges.push({
-          text: points,
-          color: 'green'
-        });
-      }
       if (parentName) {
         badges.push({
           text: parentName,
           color: 'purple'
         });
       }
+      if (points) {
+        badges.push({
+          text: points,
+          color: 'green'
+        });
+      }
+      if (idList === epicsListId) {
+        badges.push({
+          text: 'Epic',
+          color: 'purple'
+        });
+      }
+      if (totalPoints) {
+        badges.push({
+          text: totalPoints,
+          color: 'green'
       return badges;
     });
   },
@@ -47,22 +60,24 @@ TrelloPowerUp.initialize({
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
       t.get('card', 'shared', 'parentCardId'),
-      t.get('card', 'shared', 'parentCardName')
-    ]).then(function ([points, parentCardId, parentCardName]) {
+      t.get('card', 'shared', 'parentCardName'),
+      t.get('card', 'shared', 'totalPoints'),
+      t.get('board', 'shared', 'epicsListId'),
+      t.get('card', 'idList')
+    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, idList]) {
       const badges = [];
-
       if (points) {
         badges.push({
-          title: 'Story Points',
-          text: points + ' SP',
-          color: 'blue'
+          title: 'Points',
+          text: points,
+          color: 'green'
         });
       }
-
       if (parentCardId && parentCardName) {
         badges.push({
-          title: 'Parent Card',
+          title: 'Epic',
           text: parentCardName,
+          color: 'purple',
           callback: function (t) {
             return t.navigate({
               url: `https://trello.com/c/${parentCardId}`,
@@ -71,7 +86,20 @@ TrelloPowerUp.initialize({
           }
         });
       }
-
+      if (idList === epicsListId) {
+        badges.push({
+          title: '',
+          text: 'Epic',
+          color: 'purple'
+        });
+      }
+      if (totalPoints) {
+        badges.push({
+          title: 'Points',
+          text: totalPoints,
+          color: 'green'
+        });
+      }
       return badges;
     }).catch(error => {
       console.error('Error in card-detail-badges:', error);
