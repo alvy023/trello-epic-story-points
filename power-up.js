@@ -26,7 +26,7 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'storyPoints'),
       t.get('card', 'shared', 'parentCardName'),
       t.get('board', 'shared', 'epicsListId'),
-      t.card('idList')
+      t.get('card', 'shared', 'idList')
     ]).then(function([points, parentName, epicsListId, idList]) {
       const badges = [];
       const epicLabel = "Epic";
@@ -62,7 +62,7 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'parentCardName'),
       t.get('card', 'shared', 'totalPoints'),
       t.get('board', 'shared', 'epicsListId'),
-      t.card('idList')
+      t.get('card', 'shared', 'idList')
     ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, idList]) {
       const badges = [];
       if (points) {
