@@ -6,7 +6,7 @@
     <title>Child Cards</title>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        var t = TrelloPowerUp.iframe();
+        const t = TrelloPowerUp.iframe();
 
         t.card('id').then(function(card) {
             console.log('Current Card:', card);
@@ -14,11 +14,11 @@
                 t.get('board', 'shared', 'childCards'),
                 t.get('board', 'shared', 'completedListId')
             ]).then(function([boardChildren, completedListId]) {
-                var children = (boardChildren && boardChildren[card.id]) || [];
+                const children = (boardChildren && boardChildren[card.id]) || [];
                 console.log('Child Cards:', children);
-                var listContainer = document.getElementById("childCardsList");
-                var totalPoints = 0;
-                var nonCompletedPoints = 0;
+                const listContainer = document.getElementById("childCardsList");
+                let totalPoints = 0;
+                let nonCompletedPoints = 0;
 
                 if (children.length === 0) {
                     return; // Early exit if no children
@@ -28,7 +28,7 @@
                 for (const child of children) {  // Changed to for...of
                     Promise.all([
                         t.get(child.id, 'shared', 'storyPoints'),
-                        t.get(child.id, 'shared', 'idList')
+                        t.card(child.id).then(childCardData => childCardData.idList) // Correct way to get idList
                     ]).then(function([points, idList]) {
                         console.log('Retrieved Child:', child.id);
                         let pointsInt = 0; // Use let for block scoping
@@ -43,11 +43,8 @@
                         console.log('Child Points:', pointsInt);
                         console.log('Total Points:', totalPoints);
 
-                        // Update the card badge less frequently.  Do this outside the loop.
-                        // t.set(card.id, 'shared', 'totalPoints', `${nonCompletedPoints} / ${totalPoints}`);  // Removed from inside loop
-
-                        var listItem = document.createElement("li");
-                        var link = document.createElement("a");
+                        const listItem = document.createElement("li");
+                        const link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
                         link.target = "_blank";
                         link.textContent = ` [${pointsInt} SP] - ${child.name}`;
@@ -56,7 +53,7 @@
                         
                         if (children.indexOf(child) === children.length -1) { //Check if last child
                             t.set(card.id, 'shared', 'totalPoints', `${nonCompletedPoints} / ${totalPoints}`); //Set card badge after all children are processed
-                            var totalPointsElement = document.getElementById("totalPoints");
+                            const totalPointsElement = document.getElementById("totalPoints");
                             totalPointsElement.textContent = `Total Story Points: ${nonCompletedPoints} / ${totalPoints}`;
                         }
 

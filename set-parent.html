@@ -6,17 +6,17 @@
     <title>Set Parent Card</title>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        var t = TrelloPowerUp.iframe();
+        const t = TrelloPowerUp.iframe();
 
         console.log('Power-Up iframe initialized');
 
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             return t.cards('all').then(function(cards) {
-                var epicsCards = cards.filter(card => card.idList === epicsListId);
+                const epicsCards = cards.filter(card => card.idList === epicsListId);
                 console.log('Epics Cards:', epicsCards);
-                var select = document.getElementById("parentCardSelect");
+                const select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
-                    var option = document.createElement("option");
+                    const option = document.createElement("option");
                     option.value = card.id;
                     option.text = card.name;
                     select.add(option);
@@ -29,9 +29,9 @@
         });
 
         function saveParent() {
-            var select = document.getElementById("parentCardSelect");
-            var parentId = select.value;
-            var parentName = select.options[select.selectedIndex].text;
+            const select = document.getElementById("parentCardSelect");
+            const parentId = select.value;
+            const parentName = select.options[select.selectedIndex].text;
 
             console.log('Selected Parent ID:', parentId);
             console.log('Selected Parent Name:', parentName);
@@ -42,12 +42,12 @@
                 console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
                     console.log('Old Parent ID:', oldParentId);
-                    var updates = [
+                    const updates = [
                         t.set('card', 'shared', {
                             parentCardId: parentId,
                             parentCardName: parentName
                         }),
-                        t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                        t.get('board', 'shared', 'childCards').then(function (boardChildren) {
                             boardChildren = boardChildren || {};
 
                             if (oldParentId && boardChildren[oldParentId]) {
@@ -57,7 +57,7 @@
 
                             boardChildren[parentId] = boardChildren[parentId] || [];
                             if (!boardChildren[parentId].some(c => c.id === card.id)) {
-                                boardChildren[parentId].push({ id: card.id, name: card.name });
+                                boardChildren[parentId].push({id: card.id, name: card.name});
                                 console.log('Added to new parent:', parentId, boardChildren[parentId]);
                             }
 
@@ -81,9 +81,9 @@
                 console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
                     console.log('Old Parent ID:', oldParentId);
-                    var updates = [
+                    const updates = [
                         t.remove('card', 'shared', ['parentCardId', 'parentCardName']),
-                        t.get('board', 'shared', 'childCards').then(function(boardChildren) {
+                        t.get('board', 'shared', 'childCards').then(function (boardChildren) {
                             if (oldParentId && boardChildren && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
                                 console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
@@ -115,7 +115,7 @@
                 return Promise.all(
                     children.map(child =>
                         t.get(child.id, "shared", "storyPoints").then(points => {
-                            var pointsInt = parseInt(points.toString(), 10);
+                            const pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                         })
                     )

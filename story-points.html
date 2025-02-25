@@ -6,10 +6,10 @@
     <title>Set Story Points</title>
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        var t = TrelloPowerUp.iframe();
+        const t = TrelloPowerUp.iframe();
 
         function savePoints() {
-            var points = document.getElementById("storyPoints").value;
+            const points = document.getElementById("storyPoints").value;
             console.log('Saving Points:', points);
             t.card('id').then(function(card) {
                 console.log('Current Card:', card);
@@ -53,7 +53,7 @@
                 return Promise.all(
                     children.map(child =>
                         t.get(child.id, "shared", "storyPoints").then(points => {
-                            var pointsInt = parseInt(points.toString(), 10);
+                            const pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                         })
                     )
