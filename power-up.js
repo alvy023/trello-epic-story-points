@@ -26,10 +26,9 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'storyPoints'),
       t.get('card', 'shared', 'parentCardName'),
       t.get('board', 'shared', 'epicsListId'),
-      t.card('id')
-    ]).then(function([points, parentName, epicsListId, cardData]) {
+      t.card('idList')
+    ]).then(function([points, parentName, epicsListId, idList]) {
       const badges = [];
-      const idList = cardData.idList;
       const epicLabel = "Epic";
       if (parentName) {
         badges.push({
@@ -63,10 +62,9 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'parentCardName'),
       t.get('card', 'shared', 'totalPoints'),
       t.get('board', 'shared', 'epicsListId'),
-      t.card('id')
-    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, cardData]) {
+      t.card('idList')
+    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, idList]) {
       const badges = [];
-      const idList = cardData.idList;
       if (points) {
         badges.push({
           title: 'Points',
@@ -89,8 +87,8 @@ TrelloPowerUp.initialize({
       }
       if (idList === epicsListId) {
         badges.push({
-          title: 'Epic',
-          text: 'Epic Card',
+          title: '',
+          text: 'Epic',
           color: 'purple'
         });
       }
