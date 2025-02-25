@@ -28,7 +28,7 @@
                 for (const child of children) {  // Changed to for...of
                     Promise.all([
                         t.get(child.id, 'shared', 'storyPoints'),
-                        t.card(child.id).then(childCardData => childCardData.idList) // Correct way to get idList
+                        t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList) // Correct way to get idList
                     ]).then(function([points, idList]) {
                         console.log('Retrieved Child:', child.id);
                         let pointsInt = 0; // Use let for block scoping
