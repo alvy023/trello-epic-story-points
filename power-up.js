@@ -149,27 +149,38 @@ TrelloPowerUp.initialize({
   'on-enable': function(t, options) {
     console.log('Power-Up enabled');
 
-    // Subscribe to card-moved events
-    Trello.subscribe('card-moved', function(event) {
-      const cardId = event.card.id;
+    t.subscribe('card-moved', function(event) {
+      const movedCardId = event.card.id;
       const newListId = event.newList.id;
 
-      Trello.get('board', 'shared', 'epicsListId')
+      console.log("Card moved:", movedCardId, "to list:", newListId);
+
+      t.get('board', 'shared', 'epicsListId')
         .then(epicListId => {
-          return Trello.get('board', 'shared', 'completeListId')
-            .then(completeListId => ({ epicListId, completeListId }));
+          console.log("Epic List ID:", epicListId);
+          return t.get('board', 'shared', 'completeListId')
+            .then(completeListId => {
+              console.log("Complete List ID:", completeListId);
+              return { epicListId, completeListId };
+            });
         })
         .then(({ epicListId, completeListId }) => {
           const movedToComplete = newListId === completeListId;
           const movedFromComplete = event.oldList === completeListId;
 
           if (movedToComplete || movedFromComplete) {
-            Trello.get('card', cardId, 'shared', 'parentCardId') // Assuming you store parentCardId
+            console.log("Card moved to/from Complete list. Checking parent...");
+            t.get(movedCardId, 'shared', 'parentCardId')
               .then(epicCardId => {
                 if (epicCardId) {
-                  recalculateEpicPoints(epicCardId, completeListId);
+                  console.log("Parent Epic Card ID:", epicCardId);
+                  recalculateEpicPoints(t, epicCardId, epicListId, completeListId);
+                } else {
+                  console.log("No parent card found for card:", movedCardId);
                 }
               });
+          } else {
+            console.log("Card moved within other lists, skipping recalculation.");
           }
         });
     });
@@ -196,46 +207,65 @@ TrelloPowerUp.initialize({
   }
 });
 
-function recalculateEpicPoints(epicCardId, completeListId) {
-  Trello.get('card', epicCardId, 'idList')
-    .then(epicListId => {
-       return Trello.lists.get(epicListId, { cards: 'all' });
-    })
-    .then(list => {
-        const childCards = list.cards.filter(card => {
-            return Trello.get('card', card.id, 'shared', 'parentCardId')
-            .then(id => id === epicCardId);
-        });
+function recalculateEpicPoints(t, epicCardId, epicListId, completeListId) {
+  console.log("Recalculating Epic points for card:", epicCardId, "in list:", epicListId);
 
-        return Promise.all(childCards);
+  return t.lists.get(epicListId, { cards: 'all' })
+    .then(list => {
+      console.log("Cards in Epic List:", list.cards.length);
+
+      const childCards = list.cards.filter(card => {
+        return t.get('card', card.id, 'shared', 'parentCardId')
+          .then(parentCardId => {
+            console.log("Checking parentCardId for card:", card.id, "Parent:", parentCardId);
+            return parentCardId === epicCardId;
+          });
+      });
+
+      return Promise.all(childCards).then(resolvedChildCards => {
+        console.log("Filtered Child Cards:", resolvedChildCards.length);
+        return resolvedChildCards;
+      });
     })
     .then(childCards => {
-        let totalPoints = 0;
-        const promises = childCards.map(childCard => {
-            return Trello.get('card', childCard.id, 'idList')
-            .then(childListId => {
-                if (childListId !== completeListId) {
-                    return Trello.get('card', childCard.id, 'shared', 'storyPoints')
-                    .then(points => {
-                        totalPoints += parseInt(points) || 0; // Handle cases where points aren't set or are non-numeric
-                    }).catch(error => {
-                        console.error("Error getting points for card:", childCard.id, error);
-                    });
-                }
-            });
-        });
+      let totalPoints = 0;
+      const promises = childCards.map(childCard => {
+        return t.get('card', childCard.id)
+          .then(childCardDetails => {
+            const childListId = childCardDetails.idList;
+            console.log("Child Card:", childCard.id, "List ID:", childListId);
+            if (childListId !== completeListId) {
+              return t.get('card', childCard.id, 'shared', 'storyPoints')
+                .then(points => {
+                  console.log("Child Card:", childCard.id, "Points:", points);
+                  totalPoints += parseInt(points) || 0;
+                })
+                .catch(error => {
+                  console.error("Error getting points for card:", childCard.id, error);
+                });
+            } else {
+              console.log("Child Card:", childCard.id, "in Complete list, skipping.");
+            }
+          });
+      });
 
-        return Promise.all(promises).then(() => totalPoints);
+      return Promise.all(promises).then(() => {
+        console.log("Total points calculated:", totalPoints);
+        return totalPoints;
+      });
     })
     .then(totalPoints => {
-        return Trello.set('card', epicCardId, 'shared', 'totalPoints', totalPoints.toString())
+      console.log("Setting total points for Epic card:", epicCardId, "to:", totalPoints);
+      return t.set('card', epicCardId, 'shared', 'totalPoints', totalPoints.toString())
         .then(() => {
-            return Trello.set('card', epicCardId, 'badges', {
-                text: totalPoints.toString(),
-                color: 'green'
-            });
+          return t.set('card', epicCardId, 'badges', {
+            text: totalPoints.toString(),
+            color: 'green'
+          });
         });
-    }).catch(error => {
-        console.error("Error recalculating Epic points:", error);
+    })
+    .then(() => console.log("Epic card points and badge updated successfully."))
+    .catch(error => {
+      console.error("Error recalculating Epic points:", error);
     });
 }
