@@ -42,6 +42,8 @@ TrelloPowerUp.initialize({
           color: 'green'
         });
       }
+      console.log("card-badges idList: ", idList)
+      console.log("card-badges epicsListId: ", epicsListId)
       if (idList === epicsListId) {
         badges.push({
           text: epicLabel,
@@ -85,10 +87,12 @@ TrelloPowerUp.initialize({
           }
         });
       }
+      console.log("card-detail idList: ", idList)
+      console.log("card-detail epicsListId: ", epicsListId)
       if (idList === epicsListId) {
         badges.push({
-          title: '',
-          text: 'Epic',
+          title: 'Epic',
+          text: 'Epic Card',
           color: 'purple'
         });
       }
