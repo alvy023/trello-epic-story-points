@@ -27,9 +27,10 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'parentCardName'),
       t.get('board', 'shared', 'epicsListId'),
       t.card('idList')
-    ]).then(function([points, parentName, epicsListId, idList]) {
+    ]).then(function([points, parentName, epicsListId, cardIdList]) {
       const badges = [];
       const epicLabel = "Epic";
+      const idList = cardIdList.idList;
       if (parentName) {
         badges.push({
           text: parentName,
@@ -65,8 +66,9 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'totalPoints'),
       t.get('board', 'shared', 'epicsListId'),
       t.card('idList')
-    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, idList]) {
+    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, cardIdList]) {
       const badges = [];
+      const idList = cardIdList.idList;
       if (points) {
         badges.push({
           title: 'Points',
