@@ -18,7 +18,7 @@
                 console.log('Child Cards:', children);
                 const listContainer = document.getElementById("childCardsList");
                 let totalPoints = 0;
-                let nonCompletedPoints = 0;
+                let openPoints = 0;
 
                 if (children.length === 0) {
                     return; // Early exit if no children
@@ -37,7 +37,7 @@
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                             if (idList !== completedListId) {
-                                nonCompletedPoints += pointsInt;
+                                openPoints += pointsInt;
                             }
                         }
                         console.log('Child Points:', pointsInt);
@@ -47,14 +47,15 @@
                         const link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
                         link.target = "_blank";
-                        link.textContent = ` [${pointsInt} SP] - ${child.name}`;
+                        link.textContent = ` [${pointsInt} Points] - ${child.name}`;
                         listItem.appendChild(link);
                         listContainer.appendChild(listItem); // Append directly to the list
                         
-                        if (children.indexOf(child) === children.length -1) { //Check if last child
-                            t.set(card.id, 'shared', 'totalPoints', `${nonCompletedPoints} / ${totalPoints}`); //Set card badge after all children are processed
-                            const totalPointsElement = document.getElementById("totalPoints");
-                            totalPointsElement.textContent = `Total Story Points: ${nonCompletedPoints} / ${totalPoints}`;
+                        if (children.indexOf(child) === children.length - 1) { //Check if last child
+                            t.set(card.id, 'shared', 'totalPoints', totalPoints); //Set card badge after all children are processed
+                            t.set(card.id, 'shared', 'openPoints', openPoints);
+                            const epicPointsElement = document.getElementById("epicPoints");
+                            epicPointsElement.textContent = `Total Story Points: ${openPoints} / ${totalPoints}`;
                         }
 
                     }).catch(function(error) {
@@ -68,7 +69,7 @@
     </script>
 </head>
 <body>
-    <h3 id="totalPoints"></h3>
+    <h3 id="epicPoints"></h3>
     <ul id="childCardsList"></ul>
 </body>
 </html>
