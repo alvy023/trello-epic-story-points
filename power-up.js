@@ -24,31 +24,53 @@ TrelloPowerUp.initialize({
   'card-badges': function(t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
+      t.get('card', 'shared', 'openPoints'),
+      t.get('card', 'shared', 'totalPoints'),
       t.get('card', 'shared', 'parentCardName'),
+      t.get('card', 'shared', 'parentCardId'),
       t.get('board', 'shared', 'epicsListId'),
+      t.get('board', 'shared', 'completedListId'),
+      t.get('board', 'shared', 'childCards'),
       t.card('idList')
-    ]).then(function([points, parentName, epicsListId, cardIdList]) {
+    ]).then(function([storyPoints, openPoints, totalPoints, parentName, parentId, epicsListId, completeListId, boardChildren, cardListId]) {
       const badges = [];
       const epicLabel = "Epic";
-      const idList = cardIdList.idList;
+      const idList = cardListId.idList;
+      // Child Card Badges
       if (parentName) {
         badges.push({
           text: parentName,
           color: 'purple'
         });
       }
-      if (points) {
+      if (storyPoints) {
         badges.push({
-          text: points,
+          text: storyPoints,
           color: 'green'
         });
       }
+      // Epic Card Badges
       console.log("card-badges idList: ", idList)
       console.log("card-badges epicsListId: ", epicsListId)
       if (idList === epicsListId) {
         badges.push({
           text: epicLabel,
           color: 'purple'
+        });
+      }
+      console.log("card-badges openPoints: ", openPoints)
+      console.log("card-badges totalPoints: ", totalPoints)
+      if (openPoints && totalPoints) {
+        badges.push({
+          dynamic: function () {
+            [newOpenPoints, newTotalPoints] = updateEpicPoints(openPoints, totalPoints);
+            return {
+              title: 'Points',
+              text: `${newOpenPoints} / ${newTotalPoints}`,
+              color: 'green',
+              refresh: 10
+            }
+          }
         });
       }
       return badges;
@@ -61,18 +83,19 @@ TrelloPowerUp.initialize({
   'card-detail-badges': function (t, options) {
     return Promise.all([
       t.get('card', 'shared', 'storyPoints'),
+      t.get('card', 'shared', 'openPoints'),
+      t.get('card', 'shared', 'totalPoints'),
       t.get('card', 'shared', 'parentCardId'),
       t.get('card', 'shared', 'parentCardName'),
-      t.get('card', 'shared', 'totalPoints'),
       t.get('board', 'shared', 'epicsListId'),
       t.card('idList')
-    ]).then(function ([points, parentCardId, parentCardName, totalPoints, epicsListId, cardIdList]) {
+    ]).then(function ([storyPoints, openPoints, totalPoints, parentCardId, parentCardName, epicsListId, cardIdList]) {
       const badges = [];
       const idList = cardIdList.idList;
-      if (points) {
+      if (storyPoints) {
         badges.push({
           title: 'Points',
-          text: points,
+          text: storyPoints,
           color: 'green'
         });
       }
@@ -98,10 +121,10 @@ TrelloPowerUp.initialize({
           color: 'purple'
         });
       }
-      if (totalPoints) {
+      if (openPoints && totalPoints) {
         badges.push({
           title: 'Points',
-          text: totalPoints,
+          text: `${openPoints} / ${totalPoints}`,
           color: 'green'
         });
       }
@@ -152,3 +175,10 @@ TrelloPowerUp.initialize({
     console.log('Power-Up disabled');
   }
 });
+
+func updateEpicPoints(openPoints, totalPoints) {
+  // Run the child-cards routine
+  console.log("updateEpicPoints openPoints: ", openPoints)
+  console.log("updateEpicPoints totalPoints: ", totalPoints)
+  return [openPoints, totalPoints];
+}
