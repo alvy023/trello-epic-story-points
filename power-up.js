@@ -176,7 +176,7 @@ TrelloPowerUp.initialize({
   }
 });
 
-func updateEpicPoints(openPoints, totalPoints) {
+function updateEpicPoints(openPoints, totalPoints) {
   // Run the child-cards routine
   console.log("updateEpicPoints openPoints: ", openPoints)
   console.log("updateEpicPoints totalPoints: ", totalPoints)
