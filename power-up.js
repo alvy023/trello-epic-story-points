@@ -144,7 +144,7 @@ TrelloPowerUp.initialize({
         }
         return [
           {
-            title: 'Child Cards',
+            title: 'Story Cards',
             icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
             content: {
               type: 'iframe',
@@ -178,11 +178,13 @@ TrelloPowerUp.initialize({
 
 function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
     // Run the child-cards routine
+    console.log("updateEpicPoints parentId: ", parentId)
     const children = (boardChildren && boardChildren[parentId]) || [];
     let newOpenPoints = 0;
     let newTotalPoints = 0;
     // Early exit
     if (children.length === 0) {
+        console.log("updateEpicPoints children.length = 0")
         return [openPoints, totalPoints];
     }
     // Iteratively sum points for each child
