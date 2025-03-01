@@ -102,30 +102,6 @@
                 console.error('Error removing parent:', error);
             });
         }
-
-        function updateParentCard(parentId) {
-            return t.get('board', 'shared', 'childCards').then(function (boardChildren) {
-                if (!boardChildren || !boardChildren[parentId]) {
-                    return Promise.resolve(); // No children for this parent, nothing to update
-                }
-
-                const children = boardChildren[parentId];
-                let totalPoints = 0;
-
-                return Promise.all(
-                    children.map(child =>
-                        t.get(child.id, "shared", "storyPoints").then(points => {
-                            const pointsInt = parseInt(points.toString(), 10);
-                            totalPoints += pointsInt;
-                        })
-                    )
-                ).then(() => {
-                    // Set the total story points on the parent card
-                    return t.set(parentId, "shared", "totalPoints", totalPoints);
-                });
-            });
-        }
-
     </script>
 </head>
 <body>

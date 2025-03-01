@@ -32,7 +32,7 @@ TrelloPowerUp.initialize({
       t.get('board', 'shared', 'completedListId'),
       t.get('board', 'shared', 'childCards'),
       t.card('idList')
-    ]).then(function([storyPoints, openPoints, totalPoints, parentName, parentId, epicsListId, completeListId, boardChildren, cardListId]) {
+    ]).then(function([storyPoints, openPoints, totalPoints, parentName, parentId, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
       const epicLabel = "Epic";
       const idList = cardListId.idList;
@@ -63,7 +63,7 @@ TrelloPowerUp.initialize({
       if (openPoints && totalPoints) {
         badges.push({
           dynamic: function () {
-            [newOpenPoints, newTotalPoints] = updateEpicPoints(openPoints, totalPoints);
+            [newOpenPoints, newTotalPoints] = updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
               text: `${newOpenPoints} / ${newTotalPoints}`,
@@ -176,9 +176,45 @@ TrelloPowerUp.initialize({
   }
 });
 
-function updateEpicPoints(openPoints, totalPoints) {
-  // Run the child-cards routine
-  console.log("updateEpicPoints openPoints: ", openPoints)
-  console.log("updateEpicPoints totalPoints: ", totalPoints)
-  return [openPoints, totalPoints];
+function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
+    // Run the child-cards routine
+    const children = (boardChildren && boardChildren[parentId]) || [];
+    let newOpenPoints = 0;
+    let newTotalPoints = 0;
+    // Early exit
+    if (children.length === 0) {
+        return [openPoints, totalPoints];
+    }
+    // Iteratively sum points for each child
+    for (const child of children) {
+        Promise.all([
+            t.get(child.id, 'shared', 'storyPoints'),
+            t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
+        ]).then(function([points, idList]) {
+            console.log('Retrieved Child:', child.id);
+            let pointsInt = 0;
+            if (points) {
+                console.log('Retrieved Points for Child:', points);
+                pointsInt = parseInt(points.toString(), 10);
+                newTotalPoints += pointsInt;
+                if (idList !== completedListId) {
+                    newOpenPoints += pointsInt;
+                }
+            }
+            console.log('Child Points:', pointsInt);
+            console.log('openPoints:', newOpenPoints);
+            console.log('Total Points:', newTotalPoints);
+
+            if (children.indexOf(child) === children.length - 1) {
+                t.set(parentId, 'shared', 'totalPoints', newTotalPoints);
+                t.set(parentId, 'shared', 'openPoints', newOpenPoints);
+            }
+
+        }).catch(function(error) {
+            console.error('Error retrieving points for child:', child.id, error);
+        });
+    }
+    console.log("updateEpicPoints newOpenPoints: ", newOpenPoints)
+    console.log("updateEpicPoints newTotalPoints: ", newTotalPoints)
+    return [newOpenPoints, newTotalPoints];
 }
