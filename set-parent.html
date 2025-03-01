@@ -102,6 +102,47 @@
                 console.error('Error removing parent:', error);
             });
         }
+
+        function updateParentCard(parentId) {
+            return Promise.all([
+                t.get('board', 'shared', 'childCards'),
+                t.get('board', 'shared', 'completedListId')
+            ]).then(function ([boardChildren, completedListId]) {
+                if (!boardChildren || !boardChildren[parentId]) {
+                    return Promise.resolve();
+                }
+
+                const children = boardChildren[parentId];
+                let openPoints = 0;
+                let totalPoints = 0;
+                for (const child of children) {
+                    Promise.all([
+                        t.get(child.id, 'shared', 'storyPoints'),
+                        t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
+                    ]).then(function([points, idList]) {
+                        console.log('Retrieved Child:', child.id);
+                        let pointsInt = 0;
+                        if (points) {
+                            console.log('Retrieved Points for Child:', points);
+                            pointsInt = parseInt(points.toString(), 10);
+                            totalPoints += pointsInt;
+                            if (idList !== completedListId) {
+                                openPoints += pointsInt;
+                            }
+                        }
+                        console.log('Child Points:', pointsInt);
+                        console.log('openPoints:', openPoints);
+                        console.log('Total Points:', totalPoints);
+
+                        if (children.indexOf(child) === children.length - 1) {
+                            t.set(parentId, 'shared', 'totalPoints', totalPoints);
+                            t.set(parentId, 'shared', 'openPoints', openPoints);
+                        }
+                    });
+                }
+            });
+        }
+
     </script>
 </head>
 <body>
