@@ -176,23 +176,24 @@ TrelloPowerUp.initialize({
   }
 });
 
-function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
-    // Run the child-cards routine
-    console.log("updateEpicPoints parentId: ", parentId)
+async function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
+    console.log("updateEpicPoints parentId: ", parentId);
     const children = (boardChildren && boardChildren[parentId]) || [];
     let newOpenPoints = 0;
     let newTotalPoints = 0;
-    // Early exit
+
     if (children.length === 0) {
-        console.log("updateEpicPoints children.length = 0")
+        console.log("updateEpicPoints children.length = 0");
         return [openPoints, totalPoints];
     }
-    // Iteratively sum points for each child
+
     for (const child of children) {
-        Promise.all([
-            t.get(child.id, 'shared', 'storyPoints'),
-            t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
-        ]).then(function([points, idList]) {
+        try {
+            const [points, idList] = await Promise.all([
+                t.get(child.id, 'shared', 'storyPoints'),
+                t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
+            ]);
+
             console.log('Retrieved Child:', child.id);
             let pointsInt = 0;
             if (points) {
@@ -206,17 +207,15 @@ function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoint
             console.log('Child Points:', pointsInt);
             console.log('openPoints:', newOpenPoints);
             console.log('Total Points:', newTotalPoints);
-
-            if (children.indexOf(child) === children.length - 1) {
-                t.set(parentId, 'shared', 'totalPoints', newTotalPoints);
-                t.set(parentId, 'shared', 'openPoints', newOpenPoints);
-            }
-
-        }).catch(function(error) {
+        } catch (error) {
             console.error('Error retrieving points for child:', child.id, error);
-        });
+        }
     }
-    console.log("updateEpicPoints newOpenPoints: ", newOpenPoints)
-    console.log("updateEpicPoints newTotalPoints: ", newTotalPoints)
+
+    await t.set(parentId, 'shared', 'totalPoints', newTotalPoints);
+    await t.set(parentId, 'shared', 'openPoints', newOpenPoints);
+
+    console.log("updateEpicPoints newOpenPoints: ", newOpenPoints);
+    console.log("updateEpicPoints newTotalPoints: ", newTotalPoints);
     return [newOpenPoints, newTotalPoints];
 }
