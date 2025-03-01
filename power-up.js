@@ -62,7 +62,7 @@ TrelloPowerUp.initialize({
       console.log("card-badges totalPoints: ", totalPoints)
       if (openPoints && totalPoints) {
         badges.push({
-          dynamic: function () {
+          dynamic: () => {
             [newOpenPoints, newTotalPoints] = updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
