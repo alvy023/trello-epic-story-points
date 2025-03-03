@@ -50,18 +50,13 @@ TrelloPowerUp.initialize({
         });
       }
       // Epic Card Badges
-      console.log("card-badges idList: ", idList);
-      console.log("card-badges epicsListId: ", epicsListId);
       if (idList === epicsListId) {
         badges.push({
           text: epicLabel,
           color: 'purple'
         });
       }
-      console.log("card-badges openPoints: ", openPoints);
-      console.log("card-badges totalPoints: ", totalPoints);
       if (openPoints && totalPoints) {
-        console.log("cord-badges boardChildren: ", boardChildren);
         badges.push({
           dynamic: async () => {
             const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints);
@@ -113,8 +108,6 @@ TrelloPowerUp.initialize({
           }
         });
       }
-      console.log("card-detail idList: ", idList)
-      console.log("card-detail epicsListId: ", epicsListId)
       if (idList === epicsListId) {
         badges.push({
           title: 'Epic',
@@ -178,16 +171,11 @@ TrelloPowerUp.initialize({
 });
 
 async function updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints) {
-    console.log("updateEpicPoints id: ", id);
-    console.log("updateEpicPoints boardChildren: ", boardChildren);
-    console.log("updateEpicPoints boardChildren[id.id]: ", boardChildren[id.id]);
     const children = (boardChildren && boardChildren[id.id]) || [];
-    console.log("updateEpicPoints children: ", children);
     let newOpenPoints = 0;
     let newTotalPoints = 0;
 
     if (children.length === 0) {
-        console.log("updateEpicPoints children.length = 0");
         return [openPoints, totalPoints];
     }
 
@@ -198,19 +186,14 @@ async function updateEpicPoints(t, id, completedListId, boardChildren, openPoint
                 t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
             ]);
 
-            console.log('Retrieved Child:', child.id);
             let pointsInt = 0;
             if (points) {
-                console.log('Retrieved Points for Child:', points);
                 pointsInt = parseInt(points.toString(), 10);
                 newTotalPoints += pointsInt;
                 if (idList !== completedListId) {
                     newOpenPoints += pointsInt;
                 }
             }
-            console.log('Child Points:', pointsInt);
-            console.log('openPoints:', newOpenPoints);
-            console.log('Total Points:', newTotalPoints);
         } catch (error) {
             console.error('Error retrieving points for child:', child.id, error);
         }
@@ -219,7 +202,5 @@ async function updateEpicPoints(t, id, completedListId, boardChildren, openPoint
     await t.set(id.id, 'shared', 'totalPoints', newTotalPoints);
     await t.set(id.id, 'shared', 'openPoints', newOpenPoints);
 
-    console.log("updateEpicPoints newOpenPoints: ", newOpenPoints);
-    console.log("updateEpicPoints newTotalPoints: ", newTotalPoints);
     return [newOpenPoints, newTotalPoints];
 }
