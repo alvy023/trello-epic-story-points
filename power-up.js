@@ -216,8 +216,8 @@ async function updateEpicPoints(t, id, completedListId, boardChildren, openPoint
         }
     }
 
-    await t.set(id, 'shared', 'totalPoints', newTotalPoints);
-    await t.set(id, 'shared', 'openPoints', newOpenPoints);
+    await t.set(id.id, 'shared', 'totalPoints', newTotalPoints);
+    await t.set(id.id, 'shared', 'openPoints', newOpenPoints);
 
     console.log("updateEpicPoints newOpenPoints: ", newOpenPoints);
     console.log("updateEpicPoints newTotalPoints: ", newTotalPoints);
