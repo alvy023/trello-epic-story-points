@@ -27,12 +27,12 @@ TrelloPowerUp.initialize({
       t.get('card', 'shared', 'openPoints'),
       t.get('card', 'shared', 'totalPoints'),
       t.get('card', 'shared', 'parentCardName'),
-      t.get('card', 'shared', 'parentCardId'),
+      t.card('id'),
       t.get('board', 'shared', 'epicsListId'),
       t.get('board', 'shared', 'completedListId'),
       t.get('board', 'shared', 'childCards'),
       t.card('idList')
-    ]).then(function([storyPoints, openPoints, totalPoints, parentName, parentId, epicsListId, completedListId, boardChildren, cardListId]) {
+    ]).then(function([storyPoints, openPoints, totalPoints, parentName, id, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
       const epicLabel = "Epic";
       const idList = cardListId.idList;
@@ -64,7 +64,7 @@ TrelloPowerUp.initialize({
         console.log("cord-badges boardChildren: ", boardChildren);
         badges.push({
           dynamic: async () => {
-            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints);
+            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
               text: `${newOpenPoints} / ${newTotalPoints}`,
@@ -177,11 +177,11 @@ TrelloPowerUp.initialize({
   }
 });
 
-async function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
-    console.log("updateEpicPoints parentId: ", parentId);
+async function updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints) {
+    console.log("updateEpicPoints id: ", id);
     console.log("updateEpicPoints boardChildren: ", boardChildren);
-    console.log("updateEpicPoints boardChildren[parentId]: ", boardChildren[parentId]);
-    const children = (boardChildren && boardChildren[parentId]) || [];
+    console.log("updateEpicPoints boardChildren[id]: ", boardChildren[parentId]);
+    const children = (boardChildren && boardChildren[id]) || [];
     console.log("updateEpicPoints children: ", children);
     let newOpenPoints = 0;
     let newTotalPoints = 0;
@@ -216,8 +216,8 @@ async function updateEpicPoints(t, parentId, completedListId, boardChildren, ope
         }
     }
 
-    await t.set(parentId, 'shared', 'totalPoints', newTotalPoints);
-    await t.set(parentId, 'shared', 'openPoints', newOpenPoints);
+    await t.set(id, 'shared', 'totalPoints', newTotalPoints);
+    await t.set(id, 'shared', 'openPoints', newOpenPoints);
 
     console.log("updateEpicPoints newOpenPoints: ", newOpenPoints);
     console.log("updateEpicPoints newTotalPoints: ", newTotalPoints);
