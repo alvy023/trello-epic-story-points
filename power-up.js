@@ -50,17 +50,18 @@ TrelloPowerUp.initialize({
         });
       }
       // Epic Card Badges
-      console.log("card-badges idList: ", idList)
-      console.log("card-badges epicsListId: ", epicsListId)
+      console.log("card-badges idList: ", idList);
+      console.log("card-badges epicsListId: ", epicsListId);
       if (idList === epicsListId) {
         badges.push({
           text: epicLabel,
           color: 'purple'
         });
       }
-      console.log("card-badges openPoints: ", openPoints)
-      console.log("card-badges totalPoints: ", totalPoints)
+      console.log("card-badges openPoints: ", openPoints);
+      console.log("card-badges totalPoints: ", totalPoints);
       if (openPoints && totalPoints) {
+        console.log("cord-badges boardChildren: ", boardChildren);
         badges.push({
           dynamic: async () => {
             const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints);
@@ -178,7 +179,10 @@ TrelloPowerUp.initialize({
 
 async function updateEpicPoints(t, parentId, completedListId, boardChildren, openPoints, totalPoints) {
     console.log("updateEpicPoints parentId: ", parentId);
+    console.log("updateEpicPoints boardChildren: ", boardChildren);
+    console.log("updateEpicPoints boardChildren[parentId]: ", boardChildren[parentId]);
     const children = (boardChildren && boardChildren[parentId]) || [];
+    console.log("updateEpicPoints children: ", children);
     let newOpenPoints = 0;
     let newTotalPoints = 0;
 
