@@ -180,8 +180,8 @@ TrelloPowerUp.initialize({
 async function updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints) {
     console.log("updateEpicPoints id: ", id);
     console.log("updateEpicPoints boardChildren: ", boardChildren);
-    console.log("updateEpicPoints boardChildren[id]: ", boardChildren[id]);
-    const children = (boardChildren && boardChildren[id]) || [];
+    console.log("updateEpicPoints boardChildren[id.id]: ", boardChildren[id.id]);
+    const children = (boardChildren && boardChildren[id.id]) || [];
     console.log("updateEpicPoints children: ", children);
     let newOpenPoints = 0;
     let newTotalPoints = 0;
