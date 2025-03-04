@@ -1,6 +1,4 @@
 # JetBrains IDE
 .idea/
 
-# Containers
-.devcontainer/
 
