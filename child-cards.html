@@ -52,7 +52,7 @@
                         row.appendChild(nameCell);
 
                         const idListCell = document.createElement("td");
-                        const listCard = t.get(idList, 'shared', 'name');
+                        const listCard = t.lists('id').then(lists => lists.find(i => i.id === idList));
                         console.log("listCard: ", listCard);
                         console.log("listCard.name: ", listCard.name);
                         idListCell.textContent = listCard.name;
