@@ -52,10 +52,9 @@
                         row.appendChild(nameCell);
 
                         const idListCell = document.createElement("td");
-                        const listCard = t.lists('id').then(lists => lists.find(i => i.id === idList));
-                        console.log("listCard: ", listCard);
-                        console.log("listCard.name: ", listCard.name);
-                        idListCell.textContent = listCard.name;
+                        const listName = t.lists('id', 'name').then(lists => lists.find(i => i.id === idList).name);
+                        console.log("listName: ", listName);
+                        idListCell.textContent = listName;
                         row.appendChild(idListCell);
 
                         tableBody.appendChild(row);
