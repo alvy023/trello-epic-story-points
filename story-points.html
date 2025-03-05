@@ -4,19 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Story Points</title>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
         const t = TrelloPowerUp.iframe();
 
         function savePoints() {
             const points = document.getElementById("storyPoints").value;
-            console.log('Saving Points:', points);
             t.card('id').then(function(card) {
-                console.log('Current Card:', card);
                 return t.set('card', 'shared', 'storyPoints', points).then(() => {
                     t.get('card', 'shared', 'parentCardId').then(function(parentId) {
                         if (parentId) {
-                            console.log('Updating Parent Card:', parentId);
                             updateParentCard(parentId);
                         }
                         t.closePopup();
@@ -26,13 +24,10 @@
         }
 
         function removePoints() {
-            console.log('Removing Points');
             t.card('id').then(function(card) {
-                console.log('Current Card:', card);
                 return t.remove('card', 'shared', 'storyPoints').then(() => {
                     t.get('card', 'shared', 'parentCardId').then(function(parentId) {
                         if (parentId) {
-                            console.log('Updating Parent Card:', parentId);
                             updateParentCard(parentId);
                         }
                         t.closePopup();
@@ -58,19 +53,14 @@
                         t.get(child.id, 'shared', 'storyPoints'),
                         t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
                     ]).then(function([points, idList]) {
-                        console.log('Retrieved Child:', child.id);
                         let pointsInt = 0;
                         if (points) {
-                            console.log('Retrieved Points for Child:', points);
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                             if (idList !== completedListId) {
                                 openPoints += pointsInt;
                             }
                         }
-                        console.log('Child Points:', pointsInt);
-                        console.log('openPoints:', openPoints);
-                        console.log('Total Points:', totalPoints);
 
                         if (children.indexOf(child) === children.length - 1) {
                             t.set(parentId, 'shared', 'totalPoints', totalPoints);
@@ -80,13 +70,12 @@
                 }
             });
         }
-
     </script>
 </head>
 <body>
-    <h2>Set Story Points</h2>
-    <input type="number" id="storyPoints" placeholder="Enter points" />
-    <button onclick="savePoints()">Save</button>
-    <button onclick="removePoints()">Remove</button>
+    <h2 class="u-inline-block">Set Story Points</h2>
+    <input type="number" id="storyPoints" placeholder="Enter points" class="input"/>
+    <button onclick="savePoints()" class="button-link">Save</button>
+    <button onclick="removePoints()" class="button-link">Remove</button>
 </body>
 </html>

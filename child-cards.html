@@ -4,60 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Child Cards</title>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
         const t = TrelloPowerUp.iframe();
 
         t.card('id').then(function(card) {
-            console.log('Current Card:', card);
             return Promise.all([
                 t.get('board', 'shared', 'childCards'),
                 t.get('board', 'shared', 'completedListId')
             ]).then(function([boardChildren, completedListId]) {
                 const children = (boardChildren && boardChildren[card.id]) || [];
-                console.log('Child Cards:', children);
-                const listContainer = document.getElementById("childCardsList");
+                const tableBody = document.getElementById("childCardsTableBody");
                 let totalPoints = 0;
                 let openPoints = 0;
 
                 if (children.length === 0) {
-                    return; // Early exit if no children
+                    return;
                 }
 
-                // Use for...of loop for cleaner iteration
-                for (const child of children) {  // Changed to for...of
+                for (const child of children) {
                     Promise.all([
                         t.get(child.id, 'shared', 'storyPoints'),
-                        t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList) // Correct way to get idList
+                        t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
                     ]).then(function([points, idList]) {
-                        console.log('Retrieved Child:', child.id);
-                        let pointsInt = 0; // Use let for block scoping
+                        let pointsInt = 0;
                         if (points) {
-                            console.log('Retrieved Points for Child:', points);
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                             if (idList !== completedListId) {
                                 openPoints += pointsInt;
                             }
                         }
-                        console.log('Child Points:', pointsInt);
-                        console.log('Total Points:', totalPoints);
 
-                        const listItem = document.createElement("li");
+                        const row = document.createElement("tr");
+
+                        const pointsCell = document.createElement("td");
+                        pointsCell.textContent = pointsInt;
+                        row.appendChild(pointsCell);
+
+                        const nameCell = document.createElement("td");
                         const link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
-                        link.target = "_blank";
-                        link.textContent = ` [${pointsInt} Points] - ${child.name}`;
-                        listItem.appendChild(link);
-                        listContainer.appendChild(listItem); // Append directly to the list
-                        
-                        if (children.indexOf(child) === children.length - 1) { //Check if last child
-                            t.set(card.id, 'shared', 'totalPoints', totalPoints); //Set card badge after all children are processed
+                        link.target = "_self";
+                        link.textContent = child.name;
+                        nameCell.appendChild(link);
+                        row.appendChild(nameCell);
+
+                        const idListCell = document.createElement("td");
+                        idListCell.textContent = idList;
+                        row.appendChild(idListCell);
+
+                        tableBody.appendChild(row);
+
+                        if (children.indexOf(child) === children.length - 1) {
+                            t.set(card.id, 'shared', 'totalPoints', totalPoints);
                             t.set(card.id, 'shared', 'openPoints', openPoints);
                             const epicPointsElement = document.getElementById("epicPoints");
                             epicPointsElement.textContent = `Total Story Points: ${openPoints} / ${totalPoints}`;
                         }
-
                     }).catch(function(error) {
                         console.error('Error retrieving points for child:', child.id, error);
                     });
@@ -69,7 +74,17 @@
     </script>
 </head>
 <body>
-    <h3 id="epicPoints"></h3>
-    <ul id="childCardsList"></ul>
+    <h3 id="epicPoints" class="u-inline-block"></h3>
+    <table class="u-inline-block">
+        <thead>
+        <tr>
+            <th>Points</th>
+            <th>Name</th>
+            <th>idList</th>
+        </tr>
+        </thead>
+        <tbody id="childCardsTableBody">
+        </tbody>
+    </table>
 </body>
 </html>

@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Parent Card</title>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
         const t = TrelloPowerUp.iframe();
 
-        console.log('Power-Up iframe initialized');
-
         t.get('board', 'shared', 'epicsListId').then(function(epicsListId) {
             return t.cards('all').then(function(cards) {
                 const epicsCards = cards.filter(card => card.idList === epicsListId);
-                console.log('Epics Cards:', epicsCards);
                 const select = document.getElementById("parentCardSelect");
                 epicsCards.forEach(card => {
                     const option = document.createElement("option");
@@ -33,15 +31,10 @@
             const parentId = select.value;
             const parentName = select.options[select.selectedIndex].text;
 
-            console.log('Selected Parent ID:', parentId);
-            console.log('Selected Parent Name:', parentName);
-
             if (!parentId) return;
 
             t.card('id', 'name').then(function(card) {
-                console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
-                    console.log('Old Parent ID:', oldParentId);
                     const updates = [
                         t.set('card', 'shared', {
                             parentCardId: parentId,
@@ -52,13 +45,11 @@
 
                             if (oldParentId && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
-                                console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
                             }
 
                             boardChildren[parentId] = boardChildren[parentId] || [];
                             if (!boardChildren[parentId].some(c => c.id === card.id)) {
                                 boardChildren[parentId].push({id: card.id, name: card.name});
-                                console.log('Added to new parent:', parentId, boardChildren[parentId]);
                             }
 
                             return t.set('board', 'shared', 'childCards', boardChildren);
@@ -66,7 +57,6 @@
                     ];
 
                     return Promise.all(updates).then(() => {
-                        console.log('Parent saved successfully');
                         t.closePopup();
                         updateParentCard(parentId);
                     });
@@ -78,22 +68,18 @@
 
         function removeParent() {
             t.card('id', 'name').then(function(card) {
-                console.log('Current Card:', card);
                 return t.get('card', 'shared', 'parentCardId').then(function(oldParentId) {
-                    console.log('Old Parent ID:', oldParentId);
                     const updates = [
                         t.remove('card', 'shared', ['parentCardId', 'parentCardName']),
                         t.get('board', 'shared', 'childCards').then(function (boardChildren) {
                             if (oldParentId && boardChildren && boardChildren[oldParentId]) {
                                 boardChildren[oldParentId] = boardChildren[oldParentId].filter(c => c.id !== card.id);
-                                console.log('Removed from old parent:', oldParentId, boardChildren[oldParentId]);
                                 return t.set('board', 'shared', 'childCards', boardChildren);
                             }
                         })
                     ];
 
                     return Promise.all(updates).then(() => {
-                        console.log('Parent removed successfully');
                         t.closePopup();
                         updateParentCard(oldParentId);
                     });
@@ -120,19 +106,14 @@
                         t.get(child.id, 'shared', 'storyPoints'),
                         t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
                     ]).then(function([points, idList]) {
-                        console.log('Retrieved Child:', child.id);
                         let pointsInt = 0;
                         if (points) {
-                            console.log('Retrieved Points for Child:', points);
                             pointsInt = parseInt(points.toString(), 10);
                             totalPoints += pointsInt;
                             if (idList !== completedListId) {
                                 openPoints += pointsInt;
                             }
                         }
-                        console.log('Child Points:', pointsInt);
-                        console.log('openPoints:', openPoints);
-                        console.log('Total Points:', totalPoints);
 
                         if (children.indexOf(child) === children.length - 1) {
                             t.set(parentId, 'shared', 'totalPoints', totalPoints);
@@ -142,15 +123,14 @@
                 }
             });
         }
-
     </script>
 </head>
 <body>
-    <h2>Set Parent Card</h2>
-    <select id="parentCardSelect">
+    <h2 class="u-inline-block">Set Parent Card</h2>
+    <select id="parentCardSelect" class="button-link">
         <option value="">Select Parent Card</option>
     </select>
-    <button onclick="saveParent()">Save</button>
-    <button onclick="removeParent()">Remove</button>
+    <button onclick="saveParent()" class="button-link">Save</button>
+    <button onclick="removeParent()" class="button-link">Remove</button>
 </body>
 </html>
