@@ -46,7 +46,7 @@
                         const nameCell = document.createElement("td");
                         const link = document.createElement("a");
                         link.href = `https://trello.com/c/${child.id}`;
-                        link.target = "_parent";
+                        link.target = "_top";
                         link.textContent = child.name;
                         nameCell.appendChild(link);
                         row.appendChild(nameCell);
