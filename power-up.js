@@ -138,7 +138,7 @@ TrelloPowerUp.initialize({
         }
         return [
           {
-            title: 'Story Cards',
+            title: 'Epic Progress',
             icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
             content: {
               type: 'iframe',

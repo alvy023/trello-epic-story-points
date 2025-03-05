@@ -52,7 +52,10 @@
                         row.appendChild(nameCell);
 
                         const idListCell = document.createElement("td");
-                        idListCell.textContent = t.card(idList).name;
+                        const listCard = t.get(idList);
+                        console.log("listCard: ", listCard);
+                        console.log("listCard.name: ", listCard.name);
+                        idListCell.textContent = listCard.name;
                         row.appendChild(idListCell);
 
                         tableBody.appendChild(row);
@@ -80,7 +83,7 @@
         <tr>
             <th>Points</th>
             <th>Name</th>
-            <th>idList</th>
+            <th>Current List</th>
         </tr>
         </thead>
         <tbody id="childCardsTableBody">
