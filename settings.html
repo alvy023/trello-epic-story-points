@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings</title>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
     <script>
-        const t = TrelloPowerUp.iframe(); // Use const for t
+        const t = TrelloPowerUp.iframe();
 
-        t.lists('id', 'name').then(lists => { // Use arrow function
+        t.lists('id', 'name').then(lists => {
             const epicsSelect = document.getElementById("epicsListSelect");
             const completedSelect = document.getElementById("completedListSelect");
 
-            // Populate select elements with existing values if present
             Promise.all([
                 t.get('board', 'shared', 'epicsListId'),
                 t.get('board', 'shared', 'completedListId')
@@ -41,19 +41,19 @@
             const epicsListId = document.getElementById("epicsListSelect").value;
             const completedListId = document.getElementById("completedListSelect").value;
             t.set('board', 'shared', 'epicsListId', epicsListId)
-                .then(() => t.set('board', 'shared', 'completedListId', completedListId)) // Chain promises
-                .then(() => t.closePopup()); // Close popup after both settings are saved
+                .then(() => t.set('board', 'shared', 'completedListId', completedListId))
+                .then(() => t.closePopup());
         }
     </script>
 </head>
 <body>
-    <h2>Settings</h2>
-    <select id="epicsListSelect">
+    <h2 class="u-inline-block">Settings</h2>
+    <select id="epicsListSelect" class="button-link">
         <option value="">Select Epics List</option>
     </select>
-    <select id="completedListSelect">
+    <select id="completedListSelect" class="button-link">
         <option value="">Select Completed List</option>
     </select>
-    <button onclick="saveSettings()">Save</button>
+    <button onclick="saveSettings()" class="button-link">Save</button>
 </body>
 </html>
