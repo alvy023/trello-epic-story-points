@@ -151,7 +151,7 @@ TrelloPowerUp.initialize({
       if (epicCards.length > 0) {
         return [{
           id: 'epic-progress', // unique id for the attachment section
-          claimed: true,
+          claimed: [t.signUrl('./epic-progress.html')],
           icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png', // new icon URL
           title: 'Epic Progress',
           content: {
