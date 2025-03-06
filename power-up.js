@@ -62,7 +62,7 @@ TrelloPowerUp.initialize({
               title: 'Points',
               icon: epicIcon, // Adding epic icon inside dynamic function's return
               text: `${newOpenPoints} / ${newTotalPoints}`,
-              color: 'green',
+              color: 'purple',
               refresh: 10
             };
           }
@@ -129,8 +129,8 @@ TrelloPowerUp.initialize({
       } else if (idList === epicsListId) {
         badges.push({
           icon: epicIcon,
-          title: '',
-          text: '',
+          title: 'Epic',
+          text: 'Epic Card',
           color: 'purple'
         });
       }
