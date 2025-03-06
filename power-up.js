@@ -107,6 +107,7 @@ TrelloPowerUp.initialize({
       }
       if (parentCardId && parentCardName) {
         badges.push({
+          icon: epicIcon,
           title: 'Epic',
           text: parentCardName,
           color: 'purple',
@@ -123,11 +124,12 @@ TrelloPowerUp.initialize({
           icon: epicIcon,
           title: 'Points',
           text: `${openPoints} / ${totalPoints}`,
-          color: 'green'
+          color: 'purple'
         });
       } else if (idList === epicsListId) {
         badges.push({
           icon: epicIcon,
+          title: '',
           text: '',
           color: 'purple'
         });
@@ -141,25 +143,27 @@ TrelloPowerUp.initialize({
   },
 
   'attachment-sections': function(t, options) {
-    var claimed = options.entries.filter(function (attachment) {
-      return attachment.url.indexOf('./epic-progress.html') !== -1;
+    return Promise.all([
+      t.get('board', 'shared', 'childCards'),
+      t.card('id')
+    ]).then(function([boardChildren, id]) {
+      const epicCards = boardChildren[id.id] || [];
+      if (epicCards.length > 0) {
+        return [{
+          id: 'epic-progress', // unique id for the attachment section
+          claimed: true,
+          icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png', // new icon URL
+          title: 'Epic Progress',
+          content: {
+            type: 'iframe',
+            url: t.signUrl('./epic-progress.html'),
+            height: 250
+          }
+        }];
+      } else {
+        return [];
+      }
     });
-
-    if (claimed && claimed.length > 0) {
-      return [{
-        id: 'epic-progress', // unique id for the attachment section
-        claimed: claimed,
-        icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png', // new icon URL
-        title: 'Epic Progress',
-        content: {
-          type: 'iframe',
-          url: t.signUrl('./epic-progress.html'),
-          height: 250
-        }
-      }];
-    } else {
-      return [];
-    }
   },
 
   'show-settings': function(t, options) {
