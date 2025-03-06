@@ -6,7 +6,7 @@ TrelloPowerUp.initialize({
       callback: function(t) {
         return t.popup({
           title: 'Set Story Points',
-          url: 'story-points.html'
+          url: 'set-points.html'
         });
       }
     }, {
@@ -34,8 +34,10 @@ TrelloPowerUp.initialize({
       t.card('idList')
     ]).then(function([storyPoints, openPoints, totalPoints, parentName, id, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
-      const epicLabel = "Epic";
+      const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/11365/11365822.png'; // New icon for story points
+      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png'; // Epic icon
       const idList = cardListId.idList;
+
       // Child Card Badges
       if (parentName) {
         badges.push({
@@ -45,30 +47,34 @@ TrelloPowerUp.initialize({
       }
       if (storyPoints) {
         badges.push({
+          icon: storyPointsIcon,
           text: storyPoints,
           color: 'green'
         });
       }
+
       // Epic Card Badges
-      if (idList === epicsListId) {
-        badges.push({
-          text: epicLabel,
-          color: 'purple'
-        });
-      }
       if (openPoints && totalPoints) {
         badges.push({
           dynamic: async () => {
             const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
+              icon: epicIcon, // Adding epic icon inside dynamic function's return
               text: `${newOpenPoints} / ${newTotalPoints}`,
               color: 'green',
               refresh: 10
             };
           }
         });
+      } else if (idList === epicsListId) {
+        badges.push({
+          icon: epicIcon,
+          text: '',
+          color: 'purple'
+        });
       }
+
       return badges;
     }).catch(error => {
       console.error('Error in card-badges:', error);
@@ -87,9 +93,13 @@ TrelloPowerUp.initialize({
       t.card('idList')
     ]).then(function ([storyPoints, openPoints, totalPoints, parentCardId, parentCardName, epicsListId, cardIdList]) {
       const badges = [];
+      const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/11365/11365822.png'; // New icon for story points
+      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png'; // Epic icon
       const idList = cardIdList.idList;
+
       if (storyPoints) {
         badges.push({
+          icon: storyPointsIcon,
           title: 'Points',
           text: storyPoints,
           color: 'green'
@@ -108,20 +118,21 @@ TrelloPowerUp.initialize({
           }
         });
       }
-      if (idList === epicsListId) {
-        badges.push({
-          title: 'Epic',
-          text: 'Epic Card',
-          color: 'purple'
-        });
-      }
       if (openPoints && totalPoints) {
         badges.push({
+          icon: epicIcon,
           title: 'Points',
           text: `${openPoints} / ${totalPoints}`,
           color: 'green'
         });
+      } else if (idList === epicsListId) {
+        badges.push({
+          icon: epicIcon,
+          text: '',
+          color: 'purple'
+        });
       }
+
       return badges;
     }).catch(error => {
       console.error('Error in card-detail-badges:', error);
@@ -129,28 +140,26 @@ TrelloPowerUp.initialize({
     });
   },
 
-  'card-back-section': function (t, options) {
-    return t.card('id').then(function(card) {
-      return t.get('board', 'shared', 'childCards').then(function (boardChildren) {
-        var children = (boardChildren && boardChildren[card.id]) || [];
-        if (children.length === 0) {
-          return [];
-        }
-        return [
-          {
-            title: 'Epic Progress',
-            icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
-            content: {
-              type: 'iframe',
-              url: t.signUrl('./child-cards.html')
-            }
-          }
-        ];
-      });
-    }).catch(error => {
-      console.error('Error in card-back-section:', error);
-      return [];
+  'attachment-sections': function(t, options) {
+    var claimed = options.entries.filter(function (attachment) {
+      return attachment.url.indexOf('./epic-progress.html') !== -1;
     });
+
+    if (claimed && claimed.length > 0) {
+      return [{
+        id: 'epic-progress', // unique id for the attachment section
+        claimed: claimed,
+        icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png', // new icon URL
+        title: 'Epic Progress',
+        content: {
+          type: 'iframe',
+          url: t.signUrl('./epic-progress.html'),
+          height: 250
+        }
+      }];
+    } else {
+      return [];
+    }
   },
 
   'show-settings': function(t, options) {
@@ -171,36 +180,36 @@ TrelloPowerUp.initialize({
 });
 
 async function updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints) {
-    const children = (boardChildren && boardChildren[id.id]) || [];
-    let newOpenPoints = 0;
-    let newTotalPoints = 0;
+  const children = (boardChildren && boardChildren[id.id]) || [];
+  let newOpenPoints = 0;
+  let newTotalPoints = 0;
 
-    if (children.length === 0) {
-        return [openPoints, totalPoints];
-    }
+  if (children.length === 0) {
+    return [openPoints, totalPoints];
+  }
 
-    for (const child of children) {
-        try {
-            const [points, idList] = await Promise.all([
-                t.get(child.id, 'shared', 'storyPoints'),
-                t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
-            ]);
+  for (const child of children) {
+    try {
+      const [points, idList] = await Promise.all([
+        t.get(child.id, 'shared', 'storyPoints'),
+        t.cards('id', 'idList').then(cards => cards.find(c => c.id === child.id).idList)
+      ]);
 
-            let pointsInt = 0;
-            if (points) {
-                pointsInt = parseInt(points.toString(), 10);
-                newTotalPoints += pointsInt;
-                if (idList !== completedListId) {
-                    newOpenPoints += pointsInt;
-                }
-            }
-        } catch (error) {
-            console.error('Error retrieving points for child:', child.id, error);
+      let pointsInt = 0;
+      if (points) {
+        pointsInt = parseInt(points.toString(), 10);
+        newTotalPoints += pointsInt;
+        if (idList !== completedListId) {
+          newOpenPoints += pointsInt;
         }
+      }
+    } catch (error) {
+      console.error('Error retrieving points for child:', child.id, error);
     }
+  }
 
-    await t.set(id.id, 'shared', 'totalPoints', newTotalPoints);
-    await t.set(id.id, 'shared', 'openPoints', newOpenPoints);
+  await t.set(id.id, 'shared', 'totalPoints', newTotalPoints);
+  await t.set(id.id, 'shared', 'openPoints', newOpenPoints);
 
-    return [newOpenPoints, newTotalPoints];
+  return [newOpenPoints, newTotalPoints];
 }
