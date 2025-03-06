@@ -142,28 +142,40 @@ TrelloPowerUp.initialize({
     });
   },
 
-  'attachment-sections': function(t, options) {
-    return Promise.all([
+  'attachment-sections': async function(t, options) {
+    const [boardChildren, card, attachments] = await Promise.all([
       t.get('board', 'shared', 'childCards'),
-      t.card('id')
-    ]).then(function([boardChildren, id]) {
-      const epicCards = boardChildren[id.id] || [];
-      if (epicCards.length > 0) {
+      t.card('id'),
+      t.card('attachments')
+    ]);
+    const children = boardChildren[card.id] || [];
+    if (children.length > 0) {
+      const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
+      let existingAttachment = attachments.find(att => att.url.includes(epicProgressUrl));
+      if (!existingAttachment) {
+        console.log("Attaching Epic Progress for card ID:", card.id);
+        await t.attach({
+          name: 'Epic Progress',
+          url: epicProgressUrl
+        });
+        existingAttachment = { url: epicProgressUrl };
+      }
+      const claimed = options.entries.filter(att => att.url.includes(epicProgressUrl));
+      if (claimed.length > 0) {
         return [{
-          id: 'epic-progress', // unique id for the attachment section
-          claimed: [t.signUrl('./epic-progress.html')],
-          icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png', // new icon URL
+          id: 'epic-progress',
+          claimed: claimed,
+          icon: 'https://cdn-icons-png.flaticon.com/512/12462/12462127.png',
           title: 'Epic Progress',
           content: {
             type: 'iframe',
-            url: t.signUrl('./epic-progress.html'),
+            url: t.signUrl(epicProgressUrl),
             height: 250
           }
         }];
-      } else {
-        return [];
       }
-    });
+    }
+    return [];
   },
 
   'show-settings': function(t, options) {
