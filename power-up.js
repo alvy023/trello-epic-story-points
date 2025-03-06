@@ -142,7 +142,7 @@ TrelloPowerUp.initialize({
     });
   },
 
-  'attachment-sections': async function(t, options) {
+  'attachment-sections': function(t, options) {
     return Promise.all([
       t.get('board', 'shared', 'childCards'),
       t.card('id'),
@@ -156,7 +156,7 @@ TrelloPowerUp.initialize({
         });
         if (!claimed) {
           console.log("Attaching Epic Progress for card ID:", card.id);
-          await t.attach({
+          t.attach({
             name: 'Epic Progress',
             url: epicProgressUrl
           });
