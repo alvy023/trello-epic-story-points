@@ -35,7 +35,7 @@ TrelloPowerUp.initialize({
     ]).then(function([storyPoints, openPoints, totalPoints, parentName, id, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
-      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/808/808598.png'; // Epic icon
+      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8924/8924420.png'; // Epic icon
       const idList = cardListId.idList;
 
       // Child Card Badges
@@ -94,7 +94,7 @@ TrelloPowerUp.initialize({
     ]).then(function ([storyPoints, openPoints, totalPoints, parentCardId, parentCardName, epicsListId, cardIdList]) {
       const badges = [];
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
-      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/808/808598.png'; // Epic icon
+      const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8924/8924420.png'; // Epic icon
       const idList = cardIdList.idList;
 
       if (storyPoints) {
@@ -165,7 +165,7 @@ TrelloPowerUp.initialize({
         return [{
           id: 'epic-progress',
           claimed: claimed,
-          icon: 'https://cdn-icons-png.flaticon.com/512/808/808598.png',
+          icon: 'https://cdn-icons-png.flaticon.com/512/8924/8924420.png',
           title: 'Epic Progress',
           content: {
             type: 'iframe',
