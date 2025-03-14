@@ -31,9 +31,8 @@ TrelloPowerUp.initialize({
       t.get('board', 'shared', 'epicsListId'),
       t.get('board', 'shared', 'completedListId'),
       t.get('board', 'shared', 'childCards'),
-      t.card('idList'),
-      t.card('attachments')
-    ]).then(function([storyPoints, openPoints, totalPoints, parentName, card, epicsListId, completedListId, boardChildren, cardListId, cardAttachments]) {
+      t.card('idList')
+    ]).then(function([storyPoints, openPoints, totalPoints, parentName, card, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
       const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png'; // Epic icon
@@ -58,7 +57,7 @@ TrelloPowerUp.initialize({
       if (openPoints && totalPoints) {
         badges.push({
           dynamic: async () => {
-            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints, cardAttachments);
+            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
               icon: epicIcon, // Adding epic icon inside dynamic function's return
@@ -197,7 +196,7 @@ TrelloPowerUp.initialize({
   }
 });
 
-async function updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints, attachments) {
+async function updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints) {
   const children = (boardChildren && boardChildren[card.id]) || [];
   let newOpenPoints = 0;
   let newTotalPoints = 0;
