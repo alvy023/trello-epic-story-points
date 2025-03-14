@@ -38,7 +38,6 @@ TrelloPowerUp.initialize({
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
       const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png'; // Epic icon
       const idList = cardListId.idList;
-      const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
 
       // Child Card Badges
       if (parentName) {
@@ -226,17 +225,18 @@ async function updateEpicPoints(t, card, completedListId, boardChildren, openPoi
   }
 
   console.log(attachments);
-  /**const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
-  var claimed = options.entries.filter(function (attachment) {
-    return attachment.url.indexOf(epicProgressUrl) !== -1;
-  });
+  const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
+  let claimed = false;
+  if (attachments && attachments.attachments && Array.isArray(attachments.attachments)) {
+    claimed = attachments.attachments.filter(attachment => attachment.url === epicProgressUrl);
+  }
   if (!claimed) {
     console.log("Attaching Epic Progress for card ID:", card.id);
     t.attach({
       name: 'Epic Progress',
       url: epicProgressUrl
     });
-  }**/
+  }
 
   await t.set(card.id, 'shared', 'totalPoints', newTotalPoints);
   await t.set(card.id, 'shared', 'openPoints', newOpenPoints);
