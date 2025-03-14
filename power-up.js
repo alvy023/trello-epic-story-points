@@ -58,7 +58,7 @@ TrelloPowerUp.initialize({
       if (openPoints && totalPoints) {
         badges.push({
           dynamic: async () => {
-            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints);
+            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, options, card, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
               icon: epicIcon, // Adding epic icon inside dynamic function's return
@@ -195,7 +195,7 @@ TrelloPowerUp.initialize({
   }
 });
 
-async function updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints) {
+async function updateEpicPoints(t, options, card, completedListId, boardChildren, openPoints, totalPoints) {
   const children = (boardChildren && boardChildren[card.id]) || [];
   let newOpenPoints = 0;
   let newTotalPoints = 0;
