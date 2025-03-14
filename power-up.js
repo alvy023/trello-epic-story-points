@@ -59,8 +59,7 @@ TrelloPowerUp.initialize({
           dynamic: async () => {
             const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints);
             return {
-              title: 'Points',
-              icon: epicIcon, // Adding epic icon inside dynamic function's return
+              icon: epicIcon,
               text: `${newOpenPoints} / ${newTotalPoints}`,
               color: 'purple',
               refresh: 10
