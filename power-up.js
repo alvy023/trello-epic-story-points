@@ -150,17 +150,19 @@ TrelloPowerUp.initialize({
     ]).then(function([boardChildren, card, attachments]) {
       const children = boardChildren[card.id] || [];
       if (children.length > 0) {
+        console.log('Epic Card attachment-section: ', card.id);
         const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
-        var claimed = options.entries.filter(function (attachment) {
-          return attachment.url.indexOf(epicProgressUrl) !== -1;
-        });
+        let claimed = false;
+        if (attachments && attachments.attachments) {
+          claimed = attachments.attachments.filter(attachment => attachment.url === epicProgressUrl);
+        }
         if (!claimed) {
           console.log("Attaching Epic Progress for card ID:", card.id);
           t.attach({
             name: 'Epic Progress',
             url: epicProgressUrl
           });
-          claimed = { url: epicProgressUrl };
+          claimed = true;
         }
         return [{
           id: 'epic-progress',
@@ -222,20 +224,6 @@ async function updateEpicPoints(t, card, completedListId, boardChildren, openPoi
     } catch (error) {
       console.error('Error retrieving points for child:', child.id, error);
     }
-  }
-
-  console.log(attachments);
-  const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
-  let claimed = false;
-  if (attachments && attachments.attachments && Array.isArray(attachments.attachments)) {
-    claimed = attachments.attachments.filter(attachment => attachment.url === epicProgressUrl);
-  }
-  if (!claimed) {
-    console.log("Attaching Epic Progress for card ID:", card.id);
-    t.attach({
-      name: 'Epic Progress',
-      url: epicProgressUrl
-    });
   }
 
   await t.set(card.id, 'shared', 'totalPoints', newTotalPoints);
