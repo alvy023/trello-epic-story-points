@@ -32,7 +32,7 @@ TrelloPowerUp.initialize({
       t.get('board', 'shared', 'completedListId'),
       t.get('board', 'shared', 'childCards'),
       t.card('idList')
-    ]).then(function([storyPoints, openPoints, totalPoints, parentName, id, epicsListId, completedListId, boardChildren, cardListId]) {
+    ]).then(function([storyPoints, openPoints, totalPoints, parentName, card, epicsListId, completedListId, boardChildren, cardListId]) {
       const badges = [];
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
       const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png'; // Epic icon
@@ -58,7 +58,7 @@ TrelloPowerUp.initialize({
       if (openPoints && totalPoints) {
         badges.push({
           dynamic: async () => {
-            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints);
+            const [newOpenPoints, newTotalPoints] = await updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints);
             return {
               title: 'Points',
               icon: epicIcon, // Adding epic icon inside dynamic function's return
@@ -195,8 +195,8 @@ TrelloPowerUp.initialize({
   }
 });
 
-async function updateEpicPoints(t, id, completedListId, boardChildren, openPoints, totalPoints) {
-  const children = (boardChildren && boardChildren[id.id]) || [];
+async function updateEpicPoints(t, card, completedListId, boardChildren, openPoints, totalPoints) {
+  const children = (boardChildren && boardChildren[card.id]) || [];
   let newOpenPoints = 0;
   let newTotalPoints = 0;
 
@@ -224,8 +224,20 @@ async function updateEpicPoints(t, id, completedListId, boardChildren, openPoint
     }
   }
 
-  await t.set(id.id, 'shared', 'totalPoints', newTotalPoints);
-  await t.set(id.id, 'shared', 'openPoints', newOpenPoints);
+  const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
+  var claimed = options.entries.filter(function (attachment) {
+    return attachment.url.indexOf(epicProgressUrl) !== -1;
+  });
+  if (!claimed) {
+    console.log("Attaching Epic Progress for card ID:", card.id);
+    t.attach({
+      name: 'Epic Progress',
+      url: epicProgressUrl
+    });
+  }
+
+  await t.set(card.id, 'shared', 'totalPoints', newTotalPoints);
+  await t.set(card.id, 'shared', 'openPoints', newOpenPoints);
 
   return [newOpenPoints, newTotalPoints];
 }
