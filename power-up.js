@@ -37,6 +37,7 @@ TrelloPowerUp.initialize({
       const storyPointsIcon = 'https://cdn-icons-png.flaticon.com/512/8305/8305062.png'; // New icon for story points
       const epicIcon = 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png'; // Epic icon
       const idList = cardListId.idList;
+      const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
 
       // Child Card Badges
       if (parentName) {
@@ -74,7 +75,6 @@ TrelloPowerUp.initialize({
           color: 'purple'
         });
       }
-
       return badges;
     }).catch(error => {
       console.error('Error in card-badges:', error);
@@ -152,7 +152,7 @@ TrelloPowerUp.initialize({
       if (children.length > 0) {
         const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
         var claimed = options.entries.filter(function (attachment) {
-          return attachment.url.indexOf(epicProgressUrl) === 0;
+          return attachment.url.indexOf(epicProgressUrl) !== -1;
         });
         if (!claimed) {
           console.log("Attaching Epic Progress for card ID:", card.id);
