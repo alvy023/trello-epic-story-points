@@ -148,9 +148,9 @@ TrelloPowerUp.initialize({
     ]).then(function([boardChildren, card, attachments]) {
       console.log('Epic Card attachment-section: ', card.id);
       const children = boardChildren[card.id] || [];
+      const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
       let claimed = false;
       if (children.length > 0) {
-        const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
         if (attachments && attachments.attachments) {
           claimed = attachments.attachments.filter(attachment => attachment.url === epicProgressUrl);
         }
