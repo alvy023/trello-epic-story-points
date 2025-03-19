@@ -146,11 +146,11 @@ TrelloPowerUp.initialize({
       t.card('id'),
       t.card('attachments')
     ]).then(function([boardChildren, card, attachments]) {
+      console.log('Epic Card attachment-section: ', card.id);
       const children = boardChildren[card.id] || [];
+      let claimed = false;
       if (children.length > 0) {
-        console.log('Epic Card attachment-section: ', card.id);
         const epicProgressUrl = 'https://alvy023.github.io/trello-epic-story-points/epic-progress.html';
-        let claimed = false;
         if (attachments && attachments.attachments) {
           claimed = attachments.attachments.filter(attachment => attachment.url === epicProgressUrl);
         }
@@ -162,19 +162,18 @@ TrelloPowerUp.initialize({
           });
           claimed = true;
         }
-        return [{
-          id: 'epic-progress',
-          claimed: claimed,
-          icon: 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png',
-          title: 'Epic Progress',
-          content: {
-            type: 'iframe',
-            url: t.signUrl(epicProgressUrl),
-            height: 250
-          }
-        }];
       }
-      return [];
+      return [{
+        id: 'epic-progress',
+        claimed: claimed,
+        icon: 'https://cdn-icons-png.flaticon.com/512/8860/8860871.png',
+        title: 'Epic Progress',
+        content: {
+          type: 'iframe',
+          url: t.signUrl(epicProgressUrl),
+          height: 250
+        }
+      }];
     });
   },
 
