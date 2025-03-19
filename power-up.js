@@ -158,7 +158,7 @@ TrelloPowerUp.initialize({
           console.log("Attaching Epic Progress for card ID:", card.id);
           t.attach({
             name: 'Epic Progress',
-            url: epicProgressUrl
+            url: t.signUrl(epicProgressUrl),
           });
           claimed = true;
         }
